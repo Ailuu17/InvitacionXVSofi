@@ -1,0 +1,100 @@
+/* ==========================================================================
+   ANIMACIONES GLOBALES
+   ========================================================================== */
+
+/* Animación de apertura de la invitación (Fade out general) */
+@keyframes fadeOutEnvelopeContainer {
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Animación click sello cera (Scale y Fade) */
+@keyframes sealOpenClick {
+  0% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(-50%) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Latido suave del sello en estado normal */
+@keyframes waxSealPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 10px 30px rgba(250, 128, 114, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(250, 128, 114, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 10px 30px rgba(250, 128, 114, 0.4);
+  }
+}
+
+/* Flotación suave (Textos, hint, etc) */
+@keyframes floatGentle {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Revelado de secciones al hacer scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Latido del corazón en el calendario */
+@keyframes heartPulse {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  15% { transform: translate(-50%, -50%) scale(1.25); }
+  30% { transform: translate(-50%, -50%) scale(1); }
+  45% { transform: translate(-50%, -50%) scale(1.25); }
+  60% { transform: translate(-50%, -50%) scale(1); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes heartGlow {
+  0% { filter: drop-shadow(0 0 5px rgba(250, 128, 114, 0.5)); }
+  50% { filter: drop-shadow(0 0 15px rgba(250, 128, 114, 0.9)); }
+  100% { filter: drop-shadow(0 0 5px rgba(250, 128, 114, 0.5)); }
+}
+
+/* Animaciones del botón flotante de música */
+@keyframes rotateVinyl {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes soundWave {
+  0% { height: 4px; }
+  50% { height: 16px; }
+  100% { height: 4px; }
+}

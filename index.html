@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis XV Sofía | 20.11.2026</title>
+
+    <meta name="description"
+        content="Invitación digital para los 15 Años de Sofía - 20 de Noviembre de 2026 en EL RECREO, Rosario, Colonia.">
+    <meta name="theme-color" content="#fa8072">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/css/animations.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+    <canvas id="sparkles-canvas"></canvas>
+
+    <audio id="bg-audio" loop preload="auto">
+        <!-- //cambiar canción aquí -->
+        <source src="assets/audio/musica.mp3" type="audio/mp3">
+    </audio>
+
+    <div class="floating-music-player" id="floating-music-btn" title="Controlar música">
+        <div class="music-disk-btn" id="music-disk">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+        </div>
+        <div class="music-wave-bars">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+        </div>
+        <span class="music-status-text" id="music-status-text">Música</span>
+    </div>
+
+    <div class="envelope-screen" id="envelope-screen">
+        <div class="envelope-wrapper" id="envelope-wrapper">
+            <h1 class="envelope-title">Mis XV Sofía</h1>
+
+            <div class="envelope-body">
+                <div class="envelope-left-pocket"></div>
+                <div class="envelope-right-pocket"></div>
+                <div class="envelope-bottom-pocket"></div>
+
+                <div class="envelope-card-inside">
+                    <h4>Sofía</h4>
+                    <p>Mis 15 Años</p>
+                </div>
+
+                <div class="envelope-top-flap"></div>
+
+                <div class="wax-seal-wrapper" id="wax-seal-btn" title="Toca para abrir la invitación">
+                    <!-- //cambiar cera aquí -->
+                    <img src="assets/img/wax-seal.jpg" alt="Sello de cera Sofía" class="wax-seal-img" id="wax-seal-img">
+                </div>
+            </div>
+
+            <div class="envelope-tap-hint">
+                <span class="icon">✨</span> Toca el sobre para abrir <span class="icon">✨</span>
+            </div>
+        </div>
+    </div>
+
+    <main class="invitation-wrapper" id="main-invitation">
+        <div class="main-card">
+            <section class="hero-section reveal">
+                <div class="monogram-badge">S</div>
+                <h2 class="hero-title-name">Sofía</h2>
+                <div class="hero-subtitle-misxv">mis XV</div>
+
+                <div class="emotional-quote-box">
+                    <div class="quote-icon">“</div>
+                    <p class="emotional-quote-text">
+                        Hay momentos inolvidables que se atesoran en el corazón para siempre. Cada persona, cada
+                        sonrisa, cada lágrima y cada abrazo formarán parte de mí. Te espero para ser parte de esto!!
+                    </p>
+                </div>
+
+                <div class="quinceanera-photo-frame">
+                    <!-- //cambiar foto quinceañera 1 aquí -->
+                    <img src="assets/img/sofia-1.jpg" alt="Sofía mis XV" class="quinceanera-photo"
+                        id="quinceanera-photo-1">
+                    <div class="photo-soft-overlay"></div>
+                </div>
+            </section>
+
+            <div class="decorative-divider">
+                <div class="divider-line"></div>
+                <div class="divider-sparkle">✦</div>
+                <div class="divider-line"></div>
+            </div>
+
+            <section class="date-section reveal">
+                <div class="date-big-badge">20.11.2026</div>
+                <div class="date-tagline">El gran día</div>
+
+                <div class="calendar-card">
+                    <div class="calendar-header">
+                        <span>Noviembre 2026</span>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="calendar-day-name">D</div>
+                        <div class="calendar-day-name">L</div>
+                        <div class="calendar-day-name">M</div>
+                        <div class="calendar-day-name">M</div>
+                        <div class="calendar-day-name">J</div>
+                        <div class="calendar-day-name">V</div>
+                        <div class="calendar-day-name">S</div>
+
+                        <div class="calendar-day-num">1</div>
+                        <div class="calendar-day-num">2</div>
+                        <div class="calendar-day-num">3</div>
+                        <div class="calendar-day-num">4</div>
+                        <div class="calendar-day-num">5</div>
+                        <div class="calendar-day-num">6</div>
+                        <div class="calendar-day-num">7</div>
+
+                        <div class="calendar-day-num">8</div>
+                        <div class="calendar-day-num">9</div>
+                        <div class="calendar-day-num">10</div>
+                        <div class="calendar-day-num">11</div>
+                        <div class="calendar-day-num">12</div>
+                        <div class="calendar-day-num">13</div>
+                        <div class="calendar-day-num">14</div>
+
+                        <div class="calendar-day-num">15</div>
+                        <div class="calendar-day-num">16</div>
+                        <div class="calendar-day-num">17</div>
+                        <div class="calendar-day-num">18</div>
+                        <div class="calendar-day-num">19</div>
+                        <div class="calendar-day-num event-highlight">
+                            <svg class="heart-badge-icon" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                            <span>20</span>
+                        </div>
+                        <div class="calendar-day-num">21</div>
+
+                        <div class="calendar-day-num">22</div>
+                        <div class="calendar-day-num">23</div>
+                        <div class="calendar-day-num">24</div>
+                        <div class="calendar-day-num">25</div>
+                        <div class="calendar-day-num">26</div>
+                        <div class="calendar-day-num">27</div>
+                        <div class="calendar-day-num">28</div>
+
+                        <div class="calendar-day-num">29</div>
+                        <div class="calendar-day-num">30</div>
+                        <div class="calendar-day-num empty"></div>
+                        <div class="calendar-day-num empty"></div>
+                        <div class="calendar-day-num empty"></div>
+                        <div class="calendar-day-num empty"></div>
+                        <div class="calendar-day-num empty"></div>
+                    </div>
+                </div>
+
+                <!-- //cambiar link agendar aquí -->
+                <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Mis+XV+Sof%C3%ADa&dates=20261120T210000/20261121T050000&details=Celebraci%C3%B3n+de+Mis+XV+A%C3%B1os+-+Sof%C3%ADa&location=EL+RECREO+Ruta+1%2C+km+127%2C5+-+Rosario%2C+Colonia&utm_source=copilot.com"
+                    target="_blank" rel="noopener noreferrer" class="btn-cta btn-luxury">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Agendar
+                </a>
+            </section>
+
+            <div class="decorative-divider">
+                <div class="divider-line"></div>
+                <div class="divider-sparkle">✦</div>
+                <div class="divider-line"></div>
+            </div>
+
+            <section class="countdown-section reveal">
+                <span class="section-label">FALTAN...</span>
+                <div class="countdown-container">
+                    <div class="countdown-box">
+                        <div class="countdown-number" id="cd-days">00</div>
+                        <div class="countdown-label">DÍAS</div>
+                    </div>
+                    <div class="countdown-box">
+                        <div class="countdown-number" id="cd-hours">00</div>
+                        <div class="countdown-label">HS</div>
+                    </div>
+                    <div class="countdown-box">
+                        <div class="countdown-number" id="cd-minutes">00</div>
+                        <div class="countdown-label">MIN</div>
+                    </div>
+                    <div class="countdown-box">
+                        <div class="countdown-number" id="cd-seconds">00</div>
+                        <div class="countdown-label">SEG</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="time-section reveal">
+                <div class="time-card">
+                    <span class="time-icon">⏰</span>
+                    <span class="time-text">21:00 hs.</span>
+                </div>
+            </section>
+
+            <div class="decorative-divider">
+                <div class="divider-line"></div>
+                <div class="divider-sparkle">✦</div>
+                <div class="divider-line"></div>
+            </div>
+
+            <section class="venue-section reveal">
+                <div class="venue-image-frame">
+                    <!-- //cambiar imagen de lugar aquí -->
+                    <img src="assets/img/salon-el-recreo.jpg" alt="EL RECREO - Salón de Eventos" class="venue-image"
+                        id="venue-img">
+                </div>
+                <h3 class="venue-name">EL RECREO</h3>
+                <p class="venue-address">Ruta 1, km 127,5 - Rosario, Colonia.</p>
+
+                <!-- //cambiar link ubicación aquí -->
+                <a href="https://maps.app.goo.gl/3icYEw6hGhmHRyNU6?utm_source=copilot.com" target="_blank"
+                    rel="noopener noreferrer" class="btn-cta btn-luxury">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Ver ubicación
+                </a>
+            </section>
+
+            <div class="decorative-divider">
+                <div class="divider-line"></div>
+                <div class="divider-sparkle">✦</div>
+                <div class="divider-line"></div>
+            </div>
+
+            <section class="dresscode-section reveal">
+                <div class="dresscode-icons-container">
+                    <div class="dresscode-icon-box" title="Traje formal masculino">
+                        <!-- //cambiar icono vestimenta hombre aquí -->
+                        <img src="assets/img/suit-icon.svg" alt="Traje formal">
+                    </div>
+                    <div class="dresscode-icon-box" title="Vestido de noche femenino">
+                        <!-- //cambiar icono vestimenta mujer aquí -->
+                        <img src="assets/img/dress-icon.svg" alt="Vestido formal">
+                    </div>
+                </div>
+
+                <h3 class="dresscode-title">Vestimenta formal.</h3>
+                <p class="dresscode-reserved-note">Se reservan los colores: blanco, celestes y azules.</p>
+
+                <div class="colors-reserved-pills">
+                    <div class="color-pill">
+                        <span class="color-dot white"></span> Blanco
+                    </div>
+                    <div class="color-pill">
+                        <span class="color-dot light-blue"></span> Celestes
+                    </div>
+                    <div class="color-pill">
+                        <span class="color-dot blue"></span> Azules
+                    </div>
+                </div>
+            </section>
+
+            <div class="decorative-divider">
+                <div class="divider-line"></div>
+                <div class="divider-sparkle">✦</div>
+                <div class="divider-line"></div>
+            </div>
+
+            <section class="rsvp-section reveal">
+                <h3 class="rsvp-title">Confirmación de Asistencia</h3>
+                <p class="rsvp-text">
+                    Espero puedas compartir esta noche tan especial junto a mí, confirma tu asistencia antes del <span
+                        class="rsvp-date-badge">05/11/2026</span>.
+                </p>
+
+                <!-- //cambiar link formulario de confirmación aquí -->
+                <a href="https://forms.gle/HsJdNU4WTvj3VzQi9?utm_source=copilot.com" target="_blank"
+                    rel="noopener noreferrer" class="btn-cta btn-luxury">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Confirmar Asistencia
+                </a>
+            </section>
+
+            <section class="gift-section reveal">
+                <div class="section-icon-circle">
+                    <!-- //cambiar imagen regalo aquí -->
+                    <img src="assets/img/gift-icon.svg" alt="Regalo">
+                </div>
+                <h3 class="gift-title">Regalo</h3>
+                <p class="gift-text">
+                    El mejor regalo es tu presencia, pero si deseás acompañarme con un presente, podés colaborar con mis
+                    sueños y anhelos✨ ¡Muchas gracias!
+                </p>
+
+                <button type="button" class="btn-cta btn-luxury" id="open-gift-modal-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 12 20 22 4 22 4 12"></polyline>
+                        <rect x="2" y="7" width="20" height="5"></rect>
+                        <line x1="12" y1="22" x2="12" y2="7"></line>
+                        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+                        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+                    </svg>
+                    Hacer un regalo
+                </button>
+            </section>
+
+            <div class="decorative-divider">
+                <div class="divider-line"></div>
+                <div class="divider-sparkle">✦</div>
+                <div class="divider-line"></div>
+            </div>
+
+            <section class="playlist-section reveal">
+                <div class="section-icon-circle">
+                    <!-- //cambiar imagen playlist aquí -->
+                    <img src="assets/img/playlist-icon.svg" alt="Playlist de la fiesta">
+                </div>
+                <h3 class="playlist-title">Música de la Fiesta</h3>
+                <p class="playlist-text">
+                    Agrega los temas que pensás no pueden faltar en mi fiesta.
+                </p>
+
+                <!-- //cambiar link spotify aquí -->
+                <a href="https://open.spotify.com/playlist/3byeu3YA486eQCYFXdFaqg?utm_source=copilot.com"
+                    target="_blank" rel="noopener noreferrer" class="btn-cta btn-luxury">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+                    </svg>
+                    Sugerir canción
+                </a>
+            </section>
+
+            <div class="decorative-divider">
+                <div class="divider-line"></div>
+                <div class="divider-sparkle">✦</div>
+                <div class="divider-line"></div>
+            </div>
+
+            <section class="album-section reveal">
+                <div class="section-icon-circle">
+                    <!-- //cambiar imagen álbum aquí -->
+                    <img src="assets/img/album-icon.svg" alt="Álbum de fotos">
+                </div>
+                <h3 class="album-title">Álbum de Recuerdos</h3>
+                <p class="album-text">
+                    Te comparto mi álbum para que ese día lo llenes de fotos y podamos disfrutar juntos ese hermoso
+                    recuerdo.
+                </p>
+
+                <!-- //cambiar link del álbum aquí -->
+                <a href="#album-provisorio" class="btn-cta btn-luxury"
+                    onclick="alert('¡El enlace al álbum de fotos se habilitará muy pronto! ✨'); return false;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                        </path>
+                        <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                    Ver Álbum
+                </a>
+            </section>
+
+            <div class="decorative-divider">
+                <div class="divider-line"></div>
+                <div class="divider-sparkle">✦</div>
+                <div class="divider-line"></div>
+            </div>
+
+            <section class="closing-section reveal">
+                <div class="closing-photo-frame">
+                    <!-- //cambiar foto quinceañera 2 aquí -->
+                    <img src="assets/img/sofia-2.jpg" alt="Sofía" class="closing-photo" id="quinceanera-photo-2">
+                </div>
+
+                <p class="closing-thanks-text">
+                    ¡Gracias por acompañarme en este momento tan especial!
+                </p>
+
+                <div class="closing-signature">
+                    Sofía
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- //cambiar datos de tarjeta Prex aquí -->
+    <div class="gift-modal-backdrop" id="gift-modal" role="dialog" aria-modal="true">
+        <div class="gift-modal-card">
+            <button type="button" class="modal-close-btn" id="close-gift-modal-btn" title="Cerrar">&times;</button>
+
+            <div class="modal-header-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fa8072" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+            </div>
+
+            <h3 class="modal-title">Datos para el Regalo</h3>
+            <p class="modal-subtitle">Podés realizar una transferencia o depósito a la siguiente cuenta Prex:</p>
+
+            <div class="prex-card-display">
+                <!-- //cambiar datos de tarjeta Prex aquí -->
+                <div class="prex-logo-badge">PREX URUGUAY</div>
+
+                <div class="prex-data-row">
+                    <div class="prex-data-label">Número de Tarjeta / Cuenta Prex</div>
+                    <div class="prex-data-value" id="prex-number-val">1234 5678 9012</div>
+                </div>
+
+                <div class="prex-data-row">
+                    <div class="prex-data-label">Titular</div>
+                    <div class="prex-data-name" id="prex-holder-val">Sofía Pérez</div>
+                </div>
+            </div>
+
+            <button type="button" class="btn-cta btn-luxury" id="copy-prex-btn" style="width: 100%;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copiar Datos
+            </button>
+        </div>
+    </div>
+
+    <div class="copy-toast" id="copy-toast">¡Copiado con éxito!</div>
+
+    <script src="assets/js/countdown.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>

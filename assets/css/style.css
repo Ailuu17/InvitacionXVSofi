@@ -1,0 +1,1300 @@
+/* ==========================================================================
+   ESTILOS GENERALES Y DISEÑO DE ALTA GAMA - MIS XV SOFÍA
+   Colores Principales: #ffbba8 (Peach suave) & #fa8072 (Salmón coral)
+   ========================================================================== */
+
+:root {
+  --primary: #fa8072;
+  --primary-light: #ffbba8;
+  --primary-dark: #e06355;
+  --primary-glow: rgba(250, 128, 114, 0.35);
+  
+  --rose-gold: #df9e82;
+  --gold-accent: #cda26f;
+  --gold-gradient: linear-gradient(135deg, #fa8072 0%, #ffbba8 50%, #df9e82 100%);
+  
+  --bg-page: #fbf6f2;
+  --bg-card: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.92);
+  --bg-envelope: #f6eee8;
+  
+  --text-main: #2b211d;
+  --text-muted: #6b5c56;
+  --text-light: #8e7c75;
+  
+  --border-delicate: rgba(250, 128, 114, 0.22);
+  --border-gold: rgba(223, 158, 130, 0.4);
+  
+  --shadow-subtle: 0 10px 30px rgba(74, 44, 38, 0.05);
+  --shadow-card: 0 18px 45px rgba(250, 128, 114, 0.12), 0 4px 15px rgba(0, 0, 0, 0.03);
+  --shadow-float: 0 15px 35px rgba(250, 128, 114, 0.25);
+  
+  --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --font-script: 'Alex Brush', 'Great Vibes', cursive;
+  --font-sans: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Reset básico */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(255, 187, 168, 0.25) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(250, 128, 114, 0.2) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
+/* Canvas de destellos y partículas de fondo */
+#sparkles-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   1. PÁGINA PRINCIPAL / SOBRE DE BIENVENIDA (ESTILO CARTA ANTIGUA)
+   ========================================================================== */
+.envelope-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at center, #fff6f2 0%, #faeee7 60%, #eedcd3 100%);
+  transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), visibility 1s ease;
+  perspective: 1200px;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.envelope-screen.opened {
+  animation: fadeOutEnvelopeContainer 1.2s forwards ease-in-out;
+}
+
+.envelope-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  cursor: pointer;
+  perspective: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Texto de la portada: Únicamente "Mis XV Sofía" */
+.envelope-title {
+  font-family: var(--font-script);
+  font-size: 3.2rem;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 25px;
+  text-shadow: 0 2px 10px rgba(250, 128, 114, 0.25);
+  letter-spacing: 1px;
+  line-height: 1.1;
+  animation: floatGentle 4s ease-in-out infinite;
+}
+
+/* Estructura 3D del sobre */
+.envelope-body {
+  position: relative;
+  width: 100%;
+  height: 270px;
+  background: #fbf5ef;
+  border-radius: 12px;
+  box-shadow: 
+    0 25px 60px rgba(110, 75, 65, 0.18),
+    0 8px 20px rgba(250, 128, 114, 0.15),
+    inset 0 0 40px rgba(223, 158, 130, 0.2);
+  border: 1px solid rgba(223, 158, 130, 0.4);
+  transform-style: preserve-3d;
+  overflow: visible;
+}
+
+/* Solapas internas del sobre */
+.envelope-left-pocket {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-top: 135px solid transparent;
+  border-bottom: 135px solid transparent;
+  border-left: 215px solid #f6eee6;
+  border-radius: 12px 0 0 12px;
+  z-index: 3;
+  filter: drop-shadow(2px 0 5px rgba(0,0,0,0.03));
+}
+
+.envelope-right-pocket {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-top: 135px solid transparent;
+  border-bottom: 135px solid transparent;
+  border-right: 215px solid #f3ebe3;
+  border-radius: 0 12px 12px 0;
+  z-index: 3;
+  filter: drop-shadow(-2px 0 5px rgba(0,0,0,0.03));
+}
+
+.envelope-bottom-pocket {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 220px solid transparent;
+  border-right: 220px solid transparent;
+  border-bottom: 150px solid #ede3db;
+  border-radius: 0 0 12px 12px;
+  z-index: 4;
+}
+
+/* Solapa triangular superior que se abre hacia arriba */
+.envelope-top-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 220px solid transparent;
+  border-right: 220px solid transparent;
+  border-top: 155px solid #faeee4;
+  transform-origin: top center;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 6;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));
+}
+
+.envelope-screen.opening .envelope-top-flap {
+  transform: rotateX(180deg);
+  z-index: 1;
+}
+
+/* Tarjeta interior que sale del sobre */
+.envelope-card-inside {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 235px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  border: 1px solid rgba(250, 128, 114, 0.3);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  text-align: center;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+}
+
+.envelope-screen.opening .envelope-card-inside {
+  transform: translateX(-50%) translateY(-140px);
+}
+
+.envelope-card-inside h4 {
+  font-family: var(--font-script);
+  font-size: 2.2rem;
+  color: var(--primary);
+}
+
+.envelope-card-inside p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Sello de Cera (Wax Seal) */
+.wax-seal-wrapper {
+  position: absolute;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.wax-seal-img {
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  animation: waxSealPulse 3.5s infinite ease-in-out;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 30px rgba(250, 128, 114, 0.5);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.wax-seal-wrapper:hover .wax-seal-img {
+  transform: scale(1.12);
+}
+
+.envelope-screen.opening .wax-seal-wrapper {
+  animation: sealOpenClick 0.6s forwards ease-in;
+}
+
+/* Pista visual para abrir */
+.envelope-tap-hint {
+  margin-top: 25px;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: floatGentle 2.5s ease-in-out infinite;
+}
+
+.envelope-tap-hint span.icon {
+  font-size: 1.1rem;
+  color: var(--primary);
+}
+
+/* ==========================================================================
+   2. CONTENEDOR PRINCIPAL DE LA INVITACIÓN
+   ========================================================================== */
+.invitation-wrapper {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 20px 16px 80px 16px;
+}
+
+.main-card {
+  background: var(--bg-card);
+  border-radius: 28px;
+  box-shadow: 
+    0 25px 70px rgba(250, 128, 114, 0.15),
+    0 4px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 187, 168, 0.35);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Adorno superior e inferior en degradé suave */
+.main-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--gold-gradient);
+}
+
+/* ==========================================================================
+   3. SECCIÓN 1: NOMBRE / MIS XV & FRASE EMOTIVA
+   ========================================================================== */
+.hero-section {
+  text-align: center;
+  padding: 45px 25px 35px 25px;
+  position: relative;
+}
+
+.monogram-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 187, 168, 0.3), rgba(250, 128, 114, 0.2));
+  border: 1px solid var(--border-gold);
+  color: var(--primary);
+  font-family: var(--font-script);
+  font-size: 1.8rem;
+  margin-bottom: 12px;
+}
+
+.hero-title-name {
+  font-family: var(--font-script);
+  font-size: 4rem;
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+
+.hero-subtitle-misxv {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--rose-gold);
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+/* Frase emotiva */
+.emotional-quote-box {
+  background: rgba(255, 246, 242, 0.7);
+  border-radius: 18px;
+  padding: 22px 20px;
+  border: 1px dashed rgba(250, 128, 114, 0.35);
+  margin: 0 auto 30px auto;
+  position: relative;
+}
+
+.quote-icon {
+  font-size: 1.4rem;
+  color: var(--primary-light);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.emotional-quote-text {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* Foto 1 de Sofía integrada con degradados suaves y armónicos */
+.quinceanera-photo-frame {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto 10px auto;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(250, 128, 114, 0.2);
+}
+
+.quinceanera-photo {
+  width: 100%;
+  height: 440px;
+  object-fit: cover;
+  object-position: center 20%;
+  display: block;
+  transition: transform 0.8s ease;
+}
+
+.quinceanera-photo-frame:hover .quinceanera-photo {
+  transform: scale(1.03);
+}
+
+.photo-soft-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.8) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Separador elegante */
+.decorative-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin: 35px 20px;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-delicate), transparent);
+}
+
+.divider-sparkle {
+  color: var(--primary);
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   4. SECCIÓN 2: FECHA + CALENDARIO + LINK AGENDAR
+   ========================================================================== */
+.date-section {
+  text-align: center;
+  padding: 10px 25px 35px 25px;
+}
+
+.date-big-badge {
+  font-family: var(--font-serif);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 3px;
+  line-height: 1.1;
+}
+
+.date-tagline {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-style: italic;
+  color: var(--text-muted);
+  margin-bottom: 25px;
+}
+
+/* Calendario del mes de Noviembre 2026 */
+.calendar-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px 18px;
+  box-shadow: 0 10px 30px rgba(250, 128, 114, 0.1);
+  border: 1px solid var(--border-delicate);
+  max-width: 360px;
+  margin: 0 auto 25px auto;
+}
+
+.calendar-header {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--primary-dark);
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  text-align: center;
+}
+
+.calendar-day-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rose-gold);
+  text-transform: uppercase;
+  padding-bottom: 8px;
+}
+
+.calendar-day-num {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  padding: 8px 0;
+  border-radius: 8px;
+  font-weight: 500;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.calendar-day-num.empty {
+  visibility: hidden;
+}
+
+/* Día 20 con corazón palpitante */
+.calendar-day-num.event-highlight {
+  color: #ffffff;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.heart-badge-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  z-index: -1;
+  fill: var(--primary);
+  animation: heartPulse 2.4s infinite ease-in-out, heartGlow 2.4s infinite ease-in-out;
+}
+
+/* ==========================================================================
+   5. SECCIÓN 3: CUENTA REGRESIVA
+   ========================================================================== */
+.countdown-section {
+  text-align: center;
+  padding: 10px 20px 35px 20px;
+}
+
+.section-label {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--rose-gold);
+  font-weight: 600;
+  margin-bottom: 18px;
+  display: block;
+}
+
+.countdown-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.countdown-box {
+  flex: 1;
+  background: linear-gradient(145deg, #ffffff 0%, #fff8f5 100%);
+  border-radius: 16px;
+  padding: 16px 8px;
+  box-shadow: 0 8px 22px rgba(250, 128, 114, 0.12);
+  border: 1px solid var(--border-delicate);
+  min-width: 70px;
+  transition: transform 0.3s ease;
+}
+
+.countdown-box:hover {
+  transform: translateY(-3px);
+}
+
+.countdown-number {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.countdown-label {
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   6. SECCIÓN 4: HORA DEL EVENTO
+   ========================================================================== */
+.time-section {
+  text-align: center;
+  padding: 10px 25px 30px 25px;
+}
+
+.time-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255, 246, 242, 0.8);
+  border: 1px solid var(--border-delicate);
+  padding: 14px 28px;
+  border-radius: 50px;
+  box-shadow: var(--shadow-subtle);
+}
+
+.time-icon {
+  font-size: 1.3rem;
+  color: var(--primary);
+}
+
+.time-text {
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   7. SECCIÓN 5: LUGAR + LINK UBICACIÓN
+   ========================================================================== */
+.venue-section {
+  text-align: center;
+  padding: 15px 25px 35px 25px;
+}
+
+.venue-image-frame {
+  width: 100%;
+  max-width: 420px;
+  height: 220px;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 0 auto 20px auto;
+  box-shadow: 0 12px 30px rgba(250, 128, 114, 0.15);
+  border: 1px solid var(--border-delicate);
+}
+
+.venue-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.venue-image-frame:hover .venue-image {
+  transform: scale(1.04);
+}
+
+.venue-name {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 6px;
+  letter-spacing: 2px;
+}
+
+.venue-address {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 340px;
+  margin: 0 auto 20px auto;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   8. SECCIÓN 6: VESTIMENTA / DRESS CODE
+   ========================================================================== */
+.dresscode-section {
+  text-align: center;
+  padding: 15px 25px 35px 25px;
+}
+
+.dresscode-icons-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.dresscode-icon-box {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: rgba(255, 246, 242, 0.85);
+  border: 1px solid var(--border-delicate);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-subtle);
+  padding: 12px;
+  transition: transform 0.3s ease;
+}
+
+.dresscode-icon-box:hover {
+  transform: translateY(-3px) scale(1.05);
+}
+
+.dresscode-icon-box img,
+.dresscode-icon-box svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.dresscode-title {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.dresscode-reserved-note {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 360px;
+  margin: 0 auto 18px auto;
+  line-height: 1.5;
+}
+
+/* Muestras de colores reservados */
+.colors-reserved-pills {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.color-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  color: var(--text-muted);
+}
+
+.color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.15);
+}
+
+.color-dot.white { background-color: #ffffff; }
+.color-dot.light-blue { background-color: #a8d5e5; }
+.color-dot.blue { background-color: #2b5b84; }
+
+/* ==========================================================================
+   9. SECCIÓN 7: CONFIRMACIÓN DE ASISTENCIA (RSVP)
+   ========================================================================== */
+.rsvp-section {
+  text-align: center;
+  padding: 20px 25px 35px 25px;
+  background: linear-gradient(180deg, rgba(255, 246, 242, 0.5) 0%, rgba(255, 238, 230, 0.7) 100%);
+  border-radius: 24px;
+  margin: 15px 15px 30px 15px;
+  border: 1px solid var(--border-delicate);
+}
+
+.rsvp-title {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.rsvp-text {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 360px;
+  margin: 0 auto 22px auto;
+  line-height: 1.6;
+}
+
+.rsvp-date-badge {
+  display: inline-block;
+  font-weight: 700;
+  color: var(--primary-dark);
+  background: rgba(255, 187, 168, 0.3);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* ==========================================================================
+   10. SECCIÓN 8: REGALO / COLECTIVO PREX
+   ========================================================================== */
+.gift-section {
+  text-align: center;
+  padding: 15px 25px 35px 25px;
+}
+
+.section-icon-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 187, 168, 0.4), rgba(250, 128, 114, 0.25));
+  border: 1px solid var(--border-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px auto;
+  padding: 14px;
+  box-shadow: 0 8px 20px rgba(250, 128, 114, 0.15);
+}
+
+.section-icon-circle img,
+.section-icon-circle svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.gift-title {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.gift-text {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 380px;
+  margin: 0 auto 20px auto;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   11. SECCIÓN 9: PLAYLIST SPOTIFY
+   ========================================================================== */
+.playlist-section {
+  text-align: center;
+  padding: 15px 25px 35px 25px;
+}
+
+.playlist-title {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.playlist-text {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 360px;
+  margin: 0 auto 20px auto;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   12. SECCIÓN 10: ÁLBUM DE FOTOS
+   ========================================================================== */
+.album-section {
+  text-align: center;
+  padding: 15px 25px 35px 25px;
+}
+
+.album-title {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.album-text {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 360px;
+  margin: 0 auto 20px auto;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   13. SECCIÓN 11: CIERRE Y FOTO 2 DE SOFÍA
+   ========================================================================== */
+.closing-section {
+  text-align: center;
+  padding: 20px 25px 45px 25px;
+  position: relative;
+}
+
+.closing-photo-frame {
+  width: 100%;
+  max-width: 340px;
+  height: 380px;
+  border-radius: 24px;
+  overflow: hidden;
+  margin: 0 auto 30px auto;
+  box-shadow: 0 15px 35px rgba(250, 128, 114, 0.2);
+  border: 1px solid var(--border-delicate);
+}
+
+.closing-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.closing-photo-frame:hover .closing-photo {
+  transform: scale(1.04);
+}
+
+.closing-thanks-text {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-style: italic;
+  color: var(--primary);
+  max-width: 400px;
+  margin: 0 auto 20px auto;
+  line-height: 1.4;
+}
+
+.closing-signature {
+  font-family: var(--font-script);
+  font-size: 3.2rem;
+  color: var(--rose-gold);
+  line-height: 1;
+}
+
+/* ==========================================================================
+   14. ESTILOS DE BOTONES DE LUJO (CTA)
+   ========================================================================== */
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--gold-gradient);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  border-radius: 50px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(250, 128, 114, 0.35);
+  transition: all 0.35s ease;
+}
+
+.btn-cta:hover {
+  box-shadow: 0 12px 30px rgba(250, 128, 114, 0.5);
+  color: #ffffff;
+}
+
+.btn-cta svg,
+.btn-cta i {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.2;
+}
+
+.btn-cta-secondary {
+  background: #ffffff;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  box-shadow: 0 4px 15px rgba(250, 128, 114, 0.15);
+}
+
+.btn-cta-secondary:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   15. BOTÓN FLOTANTE DE MÚSICA (EN ESQUINA - ESTILO EMI Y MARTI)
+   ========================================================================== */
+.floating-music-player {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  padding: 8px 16px 8px 8px;
+  border-radius: 50px;
+  box-shadow: 0 8px 25px rgba(250, 128, 114, 0.3);
+  border: 1px solid rgba(255, 187, 168, 0.6);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.floating-music-player:hover {
+  transform: scale(1.05);
+}
+
+.music-disk-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--gold-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(250, 128, 114, 0.4);
+}
+
+.music-disk-btn.playing {
+  animation: rotateVinyl 6s linear infinite;
+}
+
+.music-wave-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 18px;
+}
+
+.wave-bar {
+  width: 3px;
+  background: var(--primary);
+  border-radius: 3px;
+  height: 4px;
+}
+
+.floating-music-player.is-playing .wave-bar:nth-child(1) { animation: soundWave 1.2s infinite ease-in-out; }
+.floating-music-player.is-playing .wave-bar:nth-child(2) { animation: soundWave 0.8s infinite ease-in-out 0.2s; }
+.floating-music-player.is-playing .wave-bar:nth-child(3) { animation: soundWave 1.4s infinite ease-in-out 0.4s; }
+.floating-music-player.is-playing .wave-bar:nth-child(4) { animation: soundWave 0.9s infinite ease-in-out 0.1s; }
+
+.music-status-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   16. MODAL INTERACTIVO DE DATOS PREX (REGALO)
+   ========================================================================== */
+.gift-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(43, 33, 29, 0.65);
+  backdrop-filter: blur(6px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.gift-modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.gift-modal-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 24px;
+  padding: 30px 24px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+  position: relative;
+  border: 1px solid var(--border-delicate);
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gift-modal-backdrop.active .gift-modal-card {
+  transform: scale(1) translateY(0);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(250, 128, 114, 0.1);
+  border: none;
+  font-size: 1.2rem;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.modal-header-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 187, 168, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px auto;
+}
+
+.modal-title {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.modal-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+/* Tarjeta visual de datos Prex */
+.prex-card-display {
+  background: linear-gradient(135deg, #1b2038 0%, #2f3657 100%);
+  border-radius: 16px;
+  padding: 20px;
+  color: #ffffff;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 25px rgba(27, 32, 56, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.prex-card-display::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(250, 128, 114, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.prex-logo-badge {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #fa8072;
+  margin-bottom: 15px;
+}
+
+.prex-data-row {
+  margin-bottom: 10px;
+}
+
+.prex-data-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 2px;
+}
+
+.prex-data-value {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.prex-data-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.copy-toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(30px);
+  background: var(--text-main);
+  color: #ffffff;
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 10001;
+}
+
+.copy-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ==========================================================================
+   17. RESPONSIVE ADAPTATIONS
+   ========================================================================== */
+@media (max-width: 480px) {
+  .envelope-title {
+    font-size: 2.6rem;
+  }
+  .envelope-body {
+    height: 230px;
+  }
+  .envelope-left-pocket {
+    border-top: 115px solid transparent;
+    border-bottom: 115px solid transparent;
+    border-left: 175px solid #f6eee6;
+  }
+  .envelope-right-pocket {
+    border-top: 115px solid transparent;
+    border-bottom: 115px solid transparent;
+    border-right: 175px solid #f3ebe3;
+  }
+  .envelope-bottom-pocket {
+    border-left: 175px solid transparent;
+    border-right: 175px solid transparent;
+    border-bottom: 125px solid #ede3db;
+  }
+  .envelope-top-flap {
+    border-left: 175px solid transparent;
+    border-right: 175px solid transparent;
+    border-top: 130px solid #faeee4;
+  }
+  .wax-seal-img {
+    width: 80px;
+    height: 80px;
+  }
+  .wax-seal-wrapper {
+    top: 100px;
+  }
+  .hero-title-name {
+    font-size: 3.2rem;
+  }
+  .date-big-badge {
+    font-size: 2.3rem;
+  }
+  .countdown-container {
+    gap: 6px;
+  }
+  .countdown-box {
+    min-width: 60px;
+    padding: 12px 4px;
+  }
+  .countdown-number {
+    font-size: 1.8rem;
+  }
+  .floating-music-player {
+    bottom: 16px;
+    right: 16px;
+  }
+}

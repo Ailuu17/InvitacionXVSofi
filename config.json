@@ -1,0 +1,31 @@
+{
+  "name": "Sofía",
+  "event_type": "Mis 15 Años",
+  "date": "20.11.2026",
+  "date_iso": "2026-11-20T21:00:00",
+  "quote": "Hay momentos inolvidables que se atesoran en el corazón para siempre. Cada persona, cada sonrisa, cada lágrima y cada abrazo formarán parte de mí. Te espero para ser parte de esto!!",
+  "location": {
+    "name": "EL RECREO",
+    "address": "Ruta 1, km 127,5 - Rosario, Colonia.",
+    "map_link": "https://maps.app.goo.gl/3icYEw6hGhmHRyNU6?utm_source=copilot.com"
+  },
+  "calendar": {
+    "google_link": "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Mis+XV+Sof%C3%ADa&dates=20261120T210000/20261121T050000&details=Celebraci%C3%B3n+de+Mis+XV+A%C3%B1os+-+Sof%C3%ADa&location=EL+RECREO+Ruta+1%2C+km+127%2C5+-+Rosario%2C+Colonia&utm_source=copilot.com"
+  },
+  "rsvp": {
+    "deadline": "05/11/2026",
+    "form_link": "https://forms.gle/HsJdNU4WTvj3VzQi9?utm_source=copilot.com"
+  },
+  "playlist": {
+    "spotify_link": "https://open.spotify.com/playlist/3byeu3YA486eQCYFXdFaqg?utm_source=copilot.com"
+  },
+  "gift": {
+    "text": "El mejor regalo es tu presencia, pero si deseás acompañarme con un presente, podés colaborar con mis sueños y anhelos✨ ¡Muchas gracias!",
+    "prex_card": "1234 5678 9012",
+    "prex_holder": "Sofía Pérez"
+  },
+  "dresscode": {
+    "type": "Vestimenta formal.",
+    "note": "Se reservan los colores: blanco, celestes y azules."
+  }
+}
