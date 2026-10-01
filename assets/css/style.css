@@ -8,34 +8,36 @@
   --primary-light: #ffbba8;
   --primary-dark: #e06355;
   --primary-glow: rgba(250, 128, 114, 0.35);
-  
+
   --rose-gold: #df9e82;
   --gold-accent: #cda26f;
   --gold-gradient: linear-gradient(135deg, #fa8072 0%, #ffbba8 50%, #df9e82 100%);
-  
+
   --bg-page: #fbf6f2;
   --bg-card: #ffffff;
   --bg-glass: rgba(255, 255, 255, 0.92);
   --bg-envelope: #f6eee8;
-  
+
   --text-main: #2b211d;
   --text-muted: #6b5c56;
   --text-light: #8e7c75;
-  
+
   --border-delicate: rgba(250, 128, 114, 0.22);
   --border-gold: rgba(223, 158, 130, 0.4);
-  
+
   --shadow-subtle: 0 10px 30px rgba(74, 44, 38, 0.05);
   --shadow-card: 0 18px 45px rgba(250, 128, 114, 0.12), 0 4px 15px rgba(0, 0, 0, 0.03);
   --shadow-float: 0 15px 35px rgba(250, 128, 114, 0.25);
-  
+
   --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
   --font-script: 'Alex Brush', 'Great Vibes', cursive;
   --font-sans: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* Reset básico */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -54,7 +56,7 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  background-image: 
+  background-image:
     radial-gradient(circle at 10% 20%, rgba(255, 187, 168, 0.25) 0%, transparent 40%),
     radial-gradient(circle at 90% 80%, rgba(250, 128, 114, 0.2) 0%, transparent 40%);
   background-attachment: fixed;
@@ -127,7 +129,7 @@ body {
   height: 270px;
   background: #fbf5ef;
   border-radius: 12px;
-  box-shadow: 
+  box-shadow:
     0 25px 60px rgba(110, 75, 65, 0.18),
     0 8px 20px rgba(250, 128, 114, 0.15),
     inset 0 0 40px rgba(223, 158, 130, 0.2);
@@ -148,7 +150,7 @@ body {
   border-left: 215px solid #f6eee6;
   border-radius: 12px 0 0 12px;
   z-index: 3;
-  filter: drop-shadow(2px 0 5px rgba(0,0,0,0.03));
+  filter: drop-shadow(2px 0 5px rgba(0, 0, 0, 0.03));
 }
 
 .envelope-right-pocket {
@@ -162,7 +164,7 @@ body {
   border-right: 215px solid #f3ebe3;
   border-radius: 0 12px 12px 0;
   z-index: 3;
-  filter: drop-shadow(-2px 0 5px rgba(0,0,0,0.03));
+  filter: drop-shadow(-2px 0 5px rgba(0, 0, 0, 0.03));
 }
 
 .envelope-bottom-pocket {
@@ -185,13 +187,14 @@ body {
   left: 0;
   width: 0;
   height: 0;
+  border-radius: 12px 12px 0 0;
   border-left: 220px solid transparent;
   border-right: 220px solid transparent;
   border-top: 155px solid #faeee4;
   transform-origin: top center;
-  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 6;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.06));
 }
 
 .envelope-screen.opening .envelope-top-flap {
@@ -206,10 +209,10 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
-  height: 235px;
+  height: 200px;
   background: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(250, 128, 114, 0.3);
   z-index: 2;
   display: flex;
@@ -302,7 +305,7 @@ body {
 .main-card {
   background: var(--bg-card);
   border-radius: 28px;
-  box-shadow: 
+  box-shadow:
     0 25px 70px rgba(250, 128, 114, 0.15),
     0 4px 20px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(255, 187, 168, 0.35);
@@ -757,8 +760,8 @@ body {
   font-size: 0.8rem;
   font-weight: 600;
   background: #ffffff;
-  border: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
   color: var(--text-muted);
 }
 
@@ -766,12 +769,20 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.15);
+  border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
-.color-dot.white { background-color: #ffffff; }
-.color-dot.light-blue { background-color: #a8d5e5; }
-.color-dot.blue { background-color: #2b5b84; }
+.color-dot.white {
+  background-color: #ffffff;
+}
+
+.color-dot.light-blue {
+  background-color: #a8d5e5;
+}
+
+.color-dot.blue {
+  background-color: #2b5b84;
+}
 
 /* ==========================================================================
    9. SECCIÓN 7: CONFIRMACIÓN DE ASISTENCIA (RSVP)
@@ -1005,7 +1016,7 @@ body {
    ========================================================================== */
 .floating-music-player {
   position: fixed;
-  bottom: 24px;
+  top: 24px;
   right: 24px;
   z-index: 1000;
   display: flex;
@@ -1055,10 +1066,21 @@ body {
   height: 4px;
 }
 
-.floating-music-player.is-playing .wave-bar:nth-child(1) { animation: soundWave 1.2s infinite ease-in-out; }
-.floating-music-player.is-playing .wave-bar:nth-child(2) { animation: soundWave 0.8s infinite ease-in-out 0.2s; }
-.floating-music-player.is-playing .wave-bar:nth-child(3) { animation: soundWave 1.4s infinite ease-in-out 0.4s; }
-.floating-music-player.is-playing .wave-bar:nth-child(4) { animation: soundWave 0.9s infinite ease-in-out 0.1s; }
+.floating-music-player.is-playing .wave-bar:nth-child(1) {
+  animation: soundWave 1.2s infinite ease-in-out;
+}
+
+.floating-music-player.is-playing .wave-bar:nth-child(2) {
+  animation: soundWave 0.8s infinite ease-in-out 0.2s;
+}
+
+.floating-music-player.is-playing .wave-bar:nth-child(3) {
+  animation: soundWave 1.4s infinite ease-in-out 0.4s;
+}
+
+.floating-music-player.is-playing .wave-bar:nth-child(4) {
+  animation: soundWave 0.9s infinite ease-in-out 0.1s;
+}
 
 .music-status-text {
   font-size: 0.75rem;
@@ -1227,7 +1249,7 @@ body {
   border-radius: 30px;
   font-size: 0.85rem;
   font-weight: 600;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
@@ -1247,52 +1269,65 @@ body {
   .envelope-title {
     font-size: 2.6rem;
   }
+
   .envelope-body {
     height: 230px;
   }
+
   .envelope-left-pocket {
     border-top: 115px solid transparent;
     border-bottom: 115px solid transparent;
     border-left: 175px solid #f6eee6;
   }
+
   .envelope-right-pocket {
     border-top: 115px solid transparent;
     border-bottom: 115px solid transparent;
     border-right: 175px solid #f3ebe3;
   }
+
   .envelope-bottom-pocket {
     border-left: 175px solid transparent;
     border-right: 175px solid transparent;
     border-bottom: 125px solid #ede3db;
   }
+
   .envelope-top-flap {
     border-left: 175px solid transparent;
     border-right: 175px solid transparent;
     border-top: 130px solid #faeee4;
   }
+
   .wax-seal-img {
     width: 80px;
     height: 80px;
   }
+
   .wax-seal-wrapper {
     top: 100px;
   }
+
   .hero-title-name {
     font-size: 3.2rem;
   }
+
   .date-big-badge {
     font-size: 2.3rem;
   }
+
   .countdown-container {
     gap: 6px;
   }
+
   .countdown-box {
     min-width: 60px;
     padding: 12px 4px;
   }
+
   .countdown-number {
     font-size: 1.8rem;
   }
+
   .floating-music-player {
     bottom: 16px;
     right: 16px;
