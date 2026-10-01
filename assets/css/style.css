@@ -1329,7 +1329,18 @@ body {
   }
 
   .floating-music-player {
-    bottom: 16px;
+    top: auto;
+    top: 16px;
     right: 16px;
+    padding: 6px 12px 6px 6px;
+  }
+
+  .music-disk-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .music-status-text {
+    font-size: 0.65rem;
   }
 }
