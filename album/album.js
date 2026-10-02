@@ -55,6 +55,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const adminCloseBtn = document.getElementById('admin-close-btn');
   const pinErrorMsg = document.getElementById('pin-error-msg');
 
+  // Admin Exit Modal DOM
+  const adminExitModal = document.getElementById('admin-exit-modal');
+  const adminExitCloseBtn = document.getElementById('admin-exit-close-btn');
+  const adminExitCancelBtn = document.getElementById('admin-exit-cancel-btn');
+  const adminExitConfirmBtn = document.getElementById('admin-exit-confirm-btn');
+
+  // Delete Photo Modal DOM
+  const deletePhotoModal = document.getElementById('delete-photo-modal');
+  const deleteCloseBtn = document.getElementById('delete-close-btn');
+  const deleteCancelBtn = document.getElementById('delete-cancel-btn');
+  const deleteConfirmBtn = document.getElementById('delete-confirm-btn');
+  let photoToDeleteId = null;
+
   // Toast
   const toastEl = document.getElementById('album-toast');
 
@@ -407,22 +420,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const openDeletePhotoModal = (photoId) => {
+    photoToDeleteId = photoId;
+    if (deletePhotoModal) {
+      deletePhotoModal.classList.add('active');
+    }
+  };
+
+  const closeDeletePhotoModal = () => {
+    photoToDeleteId = null;
+    if (deletePhotoModal) {
+      deletePhotoModal.classList.remove('active');
+    }
+  };
+
+  if (deleteCloseBtn) deleteCloseBtn.addEventListener('click', closeDeletePhotoModal);
+  if (deleteCancelBtn) deleteCancelBtn.addEventListener('click', closeDeletePhotoModal);
+  if (deletePhotoModal) {
+    deletePhotoModal.addEventListener('click', (e) => {
+      if (e.target === deletePhotoModal) closeDeletePhotoModal();
+    });
+  }
+
+  if (deleteConfirmBtn) {
+    deleteConfirmBtn.addEventListener('click', () => {
+      if (photoToDeleteId) {
+        photos = photos.filter(p => p.id !== photoToDeleteId);
+        savePhotosToStorage();
+        showToast('Foto eliminada correctamente 🗑️', 'success');
+        renderGallery();
+
+        if (lightboxModal && lightboxModal.classList.contains('active')) {
+          closeLightbox();
+        }
+      }
+      closeDeletePhotoModal();
+    });
+  }
+
   const deletePhoto = (photoId) => {
     if (!isAdmin) {
       showToast('Debes ser administradora para eliminar fotos.', 'danger');
       return;
     }
-
-    if (confirm('¿Estás segura de que deseas eliminar esta foto?')) {
-      photos = photos.filter(p => p.id !== photoId);
-      savePhotosToStorage();
-      showToast('Foto eliminada correctamente 🗑️', 'success');
-      renderGallery();
-
-      if (lightboxModal.classList.contains('active')) {
-        closeLightbox();
-      }
-    }
+    openDeletePhotoModal(photoId);
   };
 
   /* ==========================================================================
@@ -525,18 +566,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const openAdminExitModal = () => {
+    if (adminExitModal) {
+      adminExitModal.classList.add('active');
+    }
+  };
+
+  const closeAdminExitModal = () => {
+    if (adminExitModal) {
+      adminExitModal.classList.remove('active');
+    }
+  };
+
+  if (adminExitCloseBtn) adminExitCloseBtn.addEventListener('click', closeAdminExitModal);
+  if (adminExitCancelBtn) adminExitCancelBtn.addEventListener('click', closeAdminExitModal);
+  if (adminExitModal) {
+    adminExitModal.addEventListener('click', (e) => {
+      if (e.target === adminExitModal) closeAdminExitModal();
+    });
+  }
+
+  if (adminExitConfirmBtn) {
+    adminExitConfirmBtn.addEventListener('click', () => {
+      isAdmin = false;
+      localStorage.setItem(STORAGE_KEY_ADMIN, 'false');
+      document.body.classList.remove('admin-mode');
+      updateAdminButtonUI();
+      closeAdminExitModal();
+      showToast('Has salido del modo administradora.', 'info');
+      renderGallery();
+    });
+  }
+
   if (adminToggleBtn) {
     adminToggleBtn.addEventListener('click', () => {
       if (isAdmin) {
-        // Cerrar modo admin
-        if (confirm('¿Deseas salir del Modo Administradora?')) {
-          isAdmin = false;
-          localStorage.setItem(STORAGE_KEY_ADMIN, 'false');
-          document.body.classList.remove('admin-mode');
-          updateAdminButtonUI();
-          showToast('Has salido del modo administradora.', 'info');
-          renderGallery();
-        }
+        // Abrir modal estético de confirmación para salir
+        openAdminExitModal();
       } else {
         // Abrir modal de PIN
         openAdminModal();
@@ -568,7 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const verifyPin = () => {
     const inputPin = adminPinInput.value.trim();
-    if (inputPin === ADMIN_PIN || inputPin === '1234' || inputPin.toLowerCase() === 'sofia15') {
+    if (inputPin === ADMIN_PIN || inputPin.toLowerCase() === 'sofia15') {
       isAdmin = true;
       localStorage.setItem(STORAGE_KEY_ADMIN, 'true');
       document.body.classList.add('admin-mode');

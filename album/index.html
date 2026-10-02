@@ -252,6 +252,46 @@
         </div>
     </div>
 
+    <!-- MODAL DE CONFIRMACIÓN SALIR DE MODO ADMINISTRADORA -->
+    <div class="admin-modal-backdrop" id="admin-exit-modal" role="dialog" aria-modal="true">
+        <div class="admin-modal-card">
+            <button type="button" class="lightbox-close-btn" id="admin-exit-close-btn" title="Cerrar">&times;</button>
+
+            <div class="admin-modal-icon admin-exit-icon">👑</div>
+            <h3 class="admin-modal-title">¿Salir del Modo Administradora?</h3>
+            <p class="admin-modal-text">Se desactivarán las funciones para gestionar y eliminar fotos del álbum.</p>
+
+            <div class="admin-modal-actions">
+                <button type="button" class="btn-cta btn-outline-luxury" id="admin-exit-cancel-btn">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-cta btn-luxury btn-danger-luxury" id="admin-exit-confirm-btn">
+                    Sí, salir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN ELIMINAR FOTO -->
+    <div class="admin-modal-backdrop" id="delete-photo-modal" role="dialog" aria-modal="true">
+        <div class="admin-modal-card">
+            <button type="button" class="lightbox-close-btn" id="delete-close-btn" title="Cerrar">&times;</button>
+
+            <div class="admin-modal-icon admin-exit-icon">🗑️</div>
+            <h3 class="admin-modal-title">¿Eliminar foto?</h3>
+            <p class="admin-modal-text">Esta acción no se puede deshacer. La foto se eliminará permanentemente del álbum.</p>
+
+            <div class="admin-modal-actions">
+                <button type="button" class="btn-cta btn-outline-luxury" id="delete-cancel-btn">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-cta btn-luxury btn-danger-luxury" id="delete-confirm-btn">
+                    Sí, eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- TOAST DE NOTIFICACIONES -->
     <div class="album-toast" id="album-toast">Mensaje de notificación</div>
 
