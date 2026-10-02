@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Álbum de Fotos Compartido | Mis XV Sofía</title>
+
+    <meta name="description"
+        content="Álbum de fotos compartido para los 15 Años de Sofía. ¡Subí tus recuerdos y fotos de la fiesta!">
+    <meta name="theme-color" content="#fa8072">
+
+    <!-- Fuentes de Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Estilos del Álbum -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Canvas de destellos de fondo -->
+    <canvas id="sparkles-canvas"></canvas>
+
+    <!-- NAVEGACIÓN Y HEADER DEL ÁLBUM -->
+    <nav class="album-navbar">
+        <div class="album-navbar-container">
+            <!-- //cambiar enlace de retorno aquí si cambia la ruta -->
+            <a href="../index.html" class="btn-back" title="Volver a la Invitación Digital">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Volver a la tarjeta</span>
+            </a>
+
+            <div class="nav-actions">
+                <button type="button" class="btn-admin-toggle" id="btn-admin-toggle" title="Modo Administradora para Sofía">
+                    <span>👑 Administradora</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ENCABEZADO DE BIENVENIDA -->
+    <header class="album-header-hero">
+        <div class="monogram-badge">S</div>
+        <h1 class="album-hero-title">Álbum de Recuerdos</h1>
+        <div class="album-hero-subtitle">Mis XV Sofía</div>
+        
+        <p class="album-intro-text">
+            ¡Bienvenidos a mi álbum compartido! Les agradezco mucho por acompañarme en esta noche única. 
+            Suban aquí todas las fotos y videos de la fiesta para que podamos guardar estos momentos para siempre. ✨
+        </p>
+
+        <div class="album-quick-buttons">
+            <a href="#upload-section" class="btn-cta btn-luxury">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                Subir Foto
+            </a>
+
+            <a href="#gallery-section" class="btn-cta btn-outline-luxury">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                Ver Galería
+            </a>
+        </div>
+    </header>
+
+    <div class="decorative-divider">
+        <div class="divider-line"></div>
+        <div class="divider-sparkle">✦</div>
+        <div class="divider-line"></div>
+    </div>
+
+    <!-- SECCIÓN 1: FORMULARIO DE SUBIDA DE FOTOS -->
+    <section class="upload-card-container" id="upload-section">
+        <div class="upload-glass-card">
+            <h2 class="upload-card-title">
+                <span>📸</span> Compartí tu Foto
+            </h2>
+            <p class="upload-card-subtitle">
+                Elegí una foto de tu celular o computadora y dejá una dedicación para Sofía.
+            </p>
+
+            <form id="photo-upload-form">
+                <div class="upload-form-grid">
+                    <div class="form-group">
+                        <label for="guest-name" class="form-label">Tu Nombre *</label>
+                        <input type="text" id="guest-name" class="form-input" placeholder="Ej: María y Lucas" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="photo-category" class="form-label">Categoría</label>
+                        <select id="photo-category" class="form-select">
+                            <option value="Fiesta & Baile">🎉 Fiesta & Baile</option>
+                            <option value="Quinceañera">✨ Quinceañera</option>
+                            <option value="Con Sofía">❤️ Con Sofía</option>
+                            <option value="Fotos Grupales">📸 Fotos Grupales</option>
+                            <option value="Momentos Inolvidables">🥳 Momentos Inolvidables</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="photo-caption" class="form-label">Dedicación o Mensaje (Opcional)</label>
+                        <input type="text" id="photo-caption" class="form-input" placeholder="Escribí un mensaje lindo para la quinceañera...">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label">Seleccionar Imagen *</label>
+                        
+                        <div class="dropzone-box" id="dropzone">
+                            <input type="file" id="photo-file" class="file-input-hidden" accept="image/*" required>
+                            
+                            <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <div class="dropzone-prompt">Hacé clic aquí o arrastrá tu foto</div>
+                            <div class="dropzone-subprompt">Soporta formatos JPG, PNG, WEBP</div>
+                        </div>
+
+                        <!-- Previsualización de la foto antes de enviar -->
+                        <div class="preview-container" id="preview-container">
+                            <!-- //cambiar imagen de previsualización dinámicamente aquí -->
+                            <img src="" alt="Vista previa" class="preview-img" id="preview-img">
+                            <button type="button" class="btn-remove-preview" id="remove-preview-btn" title="Quitar imagen">&times;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn-cta btn-luxury upload-submit-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        Publicar en el Álbum
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <div class="decorative-divider">
+        <div class="divider-line"></div>
+        <div class="divider-sparkle">✦</div>
+        <div class="divider-line"></div>
+    </div>
+
+    <!-- SECCIÓN 2: CONTROLES DE GALERÍA (FILTROS Y BÚSQUEDA) -->
+    <div class="gallery-controls-container" id="gallery-section">
+        <div class="filter-tabs">
+            <button type="button" class="filter-tab-btn active" data-filter="ALL">Todas las fotos</button>
+            <button type="button" class="filter-tab-btn" data-filter="Quinceañera">✨ Quinceañera</button>
+            <button type="button" class="filter-tab-btn" data-filter="Fiesta & Baile">🎉 Fiesta</button>
+            <button type="button" class="filter-tab-btn" data-filter="Con Sofía">❤️ Con Sofía</button>
+            <button type="button" class="filter-tab-btn" data-filter="Fotos Grupales">📸 Grupos</button>
+            <button type="button" class="filter-tab-btn" data-filter="Momentos Inolvidables">🥳 Momentos</button>
+        </div>
+
+        <div class="search-bar-row">
+            <div class="search-input-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="search-input" class="search-input" placeholder="Buscar por invitado o dedicatoria...">
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 3: GRID DE FOTOS EN LA GALERÍA -->
+    <section class="gallery-section-container">
+        <div class="gallery-grid" id="gallery-grid">
+            <!-- Las fotos se cargarán dinámicamente mediante album.js -->
+            <!-- //cambiar imagen aquí: Se autogeneran con fotos por defecto o fotos subidas -->
+        </div>
+    </section>
+
+    <!-- MODAL LIGHTBOX (VISOR A PANTALLA COMPLETA) -->
+    <div class="lightbox-backdrop" id="lightbox-modal" role="dialog" aria-modal="true">
+        <div class="lightbox-content-card">
+            <button type="button" class="lightbox-close-btn" id="lightbox-close-btn" title="Cerrar visor">&times;</button>
+
+            <div class="lightbox-image-area">
+                <!-- //cambiar imagen del lightbox aquí -->
+                <img src="" alt="Vista ampliada" class="lightbox-main-img" id="lightbox-main-img">
+
+                <button type="button" class="lightbox-nav-btn lightbox-prev-btn" id="lightbox-prev-btn" title="Foto anterior">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+
+                <button type="button" class="lightbox-nav-btn lightbox-next-btn" id="lightbox-next-btn" title="Siguiente foto">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="lightbox-details-area">
+                <div class="lightbox-meta-header">
+                    <div class="lightbox-category-badge" id="lightbox-category">Categoría</div>
+                    <div class="lightbox-uploader-name" id="lightbox-uploader">Nombre</div>
+                    <p class="lightbox-caption-text" id="lightbox-caption"></p>
+                </div>
+
+                <div class="lightbox-footer-row">
+                    <span class="photo-date-text" id="lightbox-date"></span>
+
+                    <button type="button" class="btn-like-heart" id="lightbox-like-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <span id="lightbox-like-count">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE ACCESO ADMINISTRADORA -->
+    <div class="admin-modal-backdrop" id="admin-modal" role="dialog" aria-modal="true">
+        <div class="admin-modal-card">
+            <button type="button" class="lightbox-close-btn" id="admin-close-btn" title="Cerrar">&times;</button>
+
+            <div class="admin-modal-icon">👑</div>
+            <h3 class="admin-modal-title">Modo Administradora</h3>
+            <p class="admin-modal-text">Ingresá el PIN de seguridad de Sofía para gestionar y eliminar fotos del álbum.</p>
+
+            <input type="password" id="admin-pin-input" class="pin-input-field" maxlength="8" placeholder="••••" autocomplete="off">
+            
+            <!-- //cambiar mensaje o PIN por defecto aquí (por defecto es 1515) -->
+            <p class="pin-error-msg" id="pin-error-msg">PIN incorrecto. Intentá nuevamente.</p>
+
+            <button type="button" class="btn-cta btn-luxury" id="admin-submit-btn" style="width: 100%;">
+                Ingresar como Administradora
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST DE NOTIFICACIONES -->
+    <div class="album-toast" id="album-toast">Mensaje de notificación</div>
+
+    <!-- SCRIPT PRINCIPAL DEL ÁLBUM -->
+    <script src="album.js"></script>
+</body>
+
+</html>

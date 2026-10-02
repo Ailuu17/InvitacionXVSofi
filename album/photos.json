@@ -1,0 +1,42 @@
+[
+  {
+    "id": "photo-default-1",
+    "url": "../assets/img/sofia-1.JPG",
+    "author": "Sofía",
+    "category": "Quinceañera",
+    "caption": "¡Preparándome para esta noche soñada! ✨",
+    "likes": 24,
+    "timestamp": "2026-11-20T20:00:00.000Z",
+    "comment": "//cambiar imagen aquí - Foto principal de la quinceañera"
+  },
+  {
+    "id": "photo-default-2",
+    "url": "../assets/img/salon-el-recreo.jpg",
+    "author": "Familia",
+    "category": "Fiesta & Baile",
+    "caption": "El salón EL RECREO listo para festejar 💖",
+    "likes": 18,
+    "timestamp": "2026-11-20T20:30:00.000Z",
+    "comment": "//cambiar imagen aquí - Foto del salón/fiesta"
+  },
+  {
+    "id": "photo-default-3",
+    "url": "../assets/img/sofia-2.jpg",
+    "author": "Sofía",
+    "category": "Momentos Inolvidables",
+    "caption": "Un recuerdo lleno de amor y alegría 🌹",
+    "likes": 31,
+    "timestamp": "2026-11-20T21:15:00.000Z",
+    "comment": "//cambiar imagen aquí - Foto de recuerdo"
+  },
+  {
+    "id": "photo-default-4",
+    "url": "../assets/img/album-icon.jpg",
+    "author": "Amigos",
+    "category": "Con Sofía",
+    "caption": "¡Con la cumpleañera más linda! 🎉",
+    "likes": 15,
+    "timestamp": "2026-11-20T22:00:00.000Z",
+    "comment": "//cambiar imagen aquí - Foto con amigos"
+  }
+]
