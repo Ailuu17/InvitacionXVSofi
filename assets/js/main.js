@@ -10,10 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Referencias para el botón de música
   const musicBtn = document.getElementById('floating-music-btn');
   const musicDisk = document.getElementById('music-disk');
-  const musicStatusText = document.getElementById('music-status-text');
-  
+
   let isMusicPlaying = false;
-  
+
   // Función para abrir la invitación
   const openInvitation = () => {
     // Evitar múltiples clicks
@@ -22,10 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Agregar clase para iniciar animaciones CSS del sobre
     envelopeScreen.classList.add('opening');
     
-    // 2. Intentar reproducir música automáticamente
-    playMusic();
+    // Nota: Comienza sin música (reproducción manual a pedido del usuario)
     
-    // 3. Remover el sobre del DOM después de la animación para no bloquear scroll
+    // 2. Remover el sobre del DOM después de la animación para no bloquear scroll
     setTimeout(() => {
       envelopeScreen.style.display = 'none';
       document.body.style.overflowY = 'auto'; // Habilitar scroll global
@@ -34,38 +32,38 @@ document.addEventListener('DOMContentLoaded', () => {
       triggerScrollReveal();
     }, 1500); // Coincide con la duración de las animaciones CSS
   };
-  
+
   // Event Listeners para abrir (Clic en el sello o en cualquier parte del sobre)
   if (waxSealBtn) waxSealBtn.addEventListener('click', (e) => {
     e.stopPropagation(); // Evitar doble disparo
     openInvitation();
   });
   if (envelopeWrapper) envelopeWrapper.addEventListener('click', openInvitation);
-  
+
   // Prevenir scroll mientras el sobre esté activo
   document.body.style.overflowY = 'hidden';
-  
+
   /* ========================================================================
      2. LÓGICA DEL REPRODUCTOR DE MÚSICA FLOTANTE
      ======================================================================== */
-  
+
   const playMusic = () => {
     bgAudio.play().then(() => {
       isMusicPlaying = true;
       updateMusicUI();
     }).catch(err => {
-      console.log("Auto-play bloqueado por el navegador", err);
+      console.log("Reproducción bloqueada por el navegador o error", err);
       isMusicPlaying = false;
       updateMusicUI();
     });
   };
-  
+
   const pauseMusic = () => {
     bgAudio.pause();
     isMusicPlaying = false;
     updateMusicUI();
   };
-  
+
   const toggleMusic = () => {
     if (isMusicPlaying) {
       pauseMusic();
@@ -73,21 +71,26 @@ document.addEventListener('DOMContentLoaded', () => {
       playMusic();
     }
   };
-  
+
   const updateMusicUI = () => {
+    if (!musicBtn) return;
     if (isMusicPlaying) {
-      musicDisk.classList.add('playing');
+      if (musicDisk) musicDisk.classList.add('playing');
       musicBtn.classList.add('is-playing');
-      musicStatusText.textContent = 'Música';
+      musicBtn.setAttribute('title', 'Pausar música');
+      musicBtn.setAttribute('aria-label', 'Pausar música');
     } else {
-      musicDisk.classList.remove('playing');
+      if (musicDisk) musicDisk.classList.remove('playing');
       musicBtn.classList.remove('is-playing');
-      musicStatusText.textContent = 'Pausa';
+      musicBtn.setAttribute('title', 'Reproducir música');
+      musicBtn.setAttribute('aria-label', 'Reproducir música');
     }
   };
-  
+
   if (musicBtn) {
     musicBtn.addEventListener('click', toggleMusic);
+    // Inicializar estado visual (detenido con ícono de play)
+    updateMusicUI();
   }
   
   /* ========================================================================

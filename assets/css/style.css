@@ -1012,82 +1012,87 @@ body {
 }
 
 /* ==========================================================================
-   15. BOTÓN FLOTANTE DE MÚSICA (EN ESQUINA - ESTILO EMI Y MARTI)
+   15. BOTÓN FLOTANTE DE MÚSICA (EN ESQUINA)
    ========================================================================== */
 .floating-music-player {
   position: fixed;
   top: 24px;
   right: 24px;
   z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  padding: 8px 16px 8px 8px;
-  border-radius: 50px;
-  box-shadow: 0 8px 25px rgba(250, 128, 114, 0.3);
-  border: 1px solid rgba(255, 187, 168, 0.6);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.floating-music-player:hover {
-  transform: scale(1.05);
-}
-
-.music-disk-btn {
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
+  padding: 0;
   border-radius: 50%;
   background: var(--gold-gradient);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 20px rgba(250, 128, 114, 0.4);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  box-shadow: 0 4px 10px rgba(250, 128, 114, 0.4);
+  outline: none;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: musicButtonPulse 2.8s ease-in-out infinite;
 }
 
-.music-disk-btn.playing {
-  animation: rotateVinyl 6s linear infinite;
+.floating-music-player:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 26px rgba(250, 128, 114, 0.55);
 }
 
-.music-wave-bars {
+/* Reducir el tamaño cuando está sonando */
+.floating-music-player.is-playing {
+  width: 36px;
+  height: 36px;
+  box-shadow: 0 3px 12px rgba(250, 128, 114, 0.28);
+  opacity: 0.92;
+  animation: none;
+}
+
+.floating-music-player.is-playing:hover {
+  transform: scale(1.08);
+  opacity: 1;
+}
+
+.music-disk-btn {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 18px;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
 }
 
-.wave-bar {
-  width: 3px;
-  background: var(--primary);
-  border-radius: 3px;
-  height: 4px;
+.floating-music-player .icon-play {
+  display: block;
+  width: 22px;
+  height: 22px;
+  transform: translateX(1.5px); /* Centrado óptico del triángulo */
 }
 
-.floating-music-player.is-playing .wave-bar:nth-child(1) {
-  animation: soundWave 1.2s infinite ease-in-out;
+.floating-music-player .icon-pause {
+  display: none;
+  width: 16px;
+  height: 16px;
 }
 
-.floating-music-player.is-playing .wave-bar:nth-child(2) {
-  animation: soundWave 0.8s infinite ease-in-out 0.2s;
+.floating-music-player.is-playing .icon-play {
+  display: none;
 }
 
-.floating-music-player.is-playing .wave-bar:nth-child(3) {
-  animation: soundWave 1.4s infinite ease-in-out 0.4s;
+.floating-music-player.is-playing .icon-pause {
+  display: block;
 }
 
-.floating-music-player.is-playing .wave-bar:nth-child(4) {
-  animation: soundWave 0.9s infinite ease-in-out 0.1s;
-}
-
-.music-status-text {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--text-muted);
+@keyframes musicButtonPulse {
+  0%, 100% {
+    box-shadow: 0 6px 20px rgba(250, 128, 114, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 26px rgba(250, 128, 114, 0.62);
+  }
 }
 
 /* ==========================================================================
@@ -1329,18 +1334,24 @@ body {
   }
 
   .floating-music-player {
-    top: auto;
     top: 16px;
     right: 16px;
-    padding: 6px 12px 6px 6px;
+    width: 44px;
+    height: 44px;
   }
 
-  .music-disk-btn {
-    width: 34px;
-    height: 34px;
+  .floating-music-player.is-playing {
+    width: 32px;
+    height: 32px;
   }
 
-  .music-status-text {
-    font-size: 0.65rem;
+  .floating-music-player .icon-play {
+    width: 20px;
+    height: 20px;
+  }
+
+  .floating-music-player.is-playing .icon-pause {
+    width: 14px;
+    height: 14px;
   }
 }
