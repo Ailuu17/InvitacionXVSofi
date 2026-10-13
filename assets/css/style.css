@@ -713,8 +713,6 @@ body {
   border-radius: 20px;
   overflow: hidden;
   margin: 0 auto 20px auto;
-  box-shadow: 0 12px 30px rgba(250, 128, 114, 0.15);
-  border: 1px solid var(--border-delicate);
 }
 
 .venue-image {
