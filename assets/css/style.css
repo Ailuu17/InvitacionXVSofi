@@ -661,7 +661,7 @@ body {
 .venue-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.6s ease;
 }
 
@@ -993,10 +993,17 @@ body {
 }
 
 .btn-cta svg,
-.btn-cta i {
+.btn-cta i,
+.btn-cta img {
   width: 18px;
   height: 18px;
   stroke-width: 2.2;
+  object-fit: contain;
+}
+
+#open-gift-modal-btn img {
+  width: 26px;
+  height: 26px;
 }
 
 .btn-cta-secondary {
