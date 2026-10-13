@@ -1019,13 +1019,13 @@ body {
   top: 24px;
   right: 24px;
   z-index: 1000;
-  width: 48px;
-  height: 48px;
+  width: 72px;
+  height: 72px;
   padding: 0;
   border-radius: 50%;
   background: var(--gold-gradient);
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 6px 20px rgba(250, 128, 114, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 24px rgba(250, 128, 114, 0.45);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1033,18 +1033,19 @@ body {
   color: #ffffff;
   outline: none;
   transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  animation: musicButtonPulse 2.8s ease-in-out infinite;
+  animation: musicAttentionBounce 2.4s ease-in-out infinite;
 }
 
 .floating-music-player:hover {
   transform: scale(1.08);
-  box-shadow: 0 8px 26px rgba(250, 128, 114, 0.55);
+  box-shadow: 0 10px 28px rgba(250, 128, 114, 0.6);
 }
 
-/* Reducir el tamaño cuando está sonando */
+/* Reducir al tamaño compacto original cuando está sonando (icono de pausa) */
 .floating-music-player.is-playing {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
   box-shadow: 0 3px 12px rgba(250, 128, 114, 0.28);
   opacity: 0.92;
   animation: none;
@@ -1062,20 +1063,24 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  overflow: hidden;
+}
+
+.music-disk-btn .music-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  user-select: none;
 }
 
 .floating-music-player .icon-play {
   display: block;
-  width: 22px;
-  height: 22px;
-  transform: translateX(1.5px); /* Centrado óptico del triángulo */
 }
 
 .floating-music-player .icon-pause {
   display: none;
-  width: 16px;
-  height: 16px;
 }
 
 .floating-music-player.is-playing .icon-play {
@@ -1086,12 +1091,27 @@ body {
   display: block;
 }
 
-@keyframes musicButtonPulse {
+/* Animación sutil y atractiva cuando está pausado para llamar la atención */
+@keyframes musicAttentionBounce {
   0%, 100% {
+    transform: translateY(0) scale(1) rotate(0deg);
     box-shadow: 0 6px 20px rgba(250, 128, 114, 0.4);
   }
-  50% {
-    box-shadow: 0 8px 26px rgba(250, 128, 114, 0.62);
+  20% {
+    transform: translateY(-4px) scale(1.05) rotate(-3deg);
+    box-shadow: 0 10px 24px rgba(250, 128, 114, 0.55);
+  }
+  35% {
+    transform: translateY(0) scale(1.02) rotate(2deg);
+    box-shadow: 0 7px 20px rgba(250, 128, 114, 0.45);
+  }
+  45% {
+    transform: translateY(-2px) scale(1.04) rotate(-1deg);
+    box-shadow: 0 9px 22px rgba(250, 128, 114, 0.5);
+  }
+  55% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    box-shadow: 0 6px 20px rgba(250, 128, 114, 0.4);
   }
 }
 
@@ -1336,22 +1356,12 @@ body {
   .floating-music-player {
     top: 16px;
     right: 16px;
-    width: 44px;
-    height: 44px;
+    width: 62px;
+    height: 62px;
   }
 
   .floating-music-player.is-playing {
-    width: 32px;
-    height: 32px;
-  }
-
-  .floating-music-player .icon-play {
-    width: 20px;
-    height: 20px;
-  }
-
-  .floating-music-player.is-playing .icon-pause {
-    width: 14px;
-    height: 14px;
+    width: 34px;
+    height: 34px;
   }
 }
