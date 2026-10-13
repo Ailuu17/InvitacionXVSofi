@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // REFERENCIAS DOM
   const galleryGrid = document.getElementById('gallery-grid');
+  const uploadSection = document.getElementById('upload-section');
+  const uploadToggleBtn = document.getElementById('btn-toggle-upload') || document.querySelector('a[href="#upload-section"]');
+  const uploadCloseBtn = document.getElementById('upload-close-btn');
   const uploadForm = document.getElementById('photo-upload-form');
   const guestNameInput = document.getElementById('guest-name');
   const categorySelect = document.getElementById('photo-category');
@@ -347,6 +350,52 @@ document.addEventListener('DOMContentLoaded', () => {
     if (previewContainer) previewContainer.classList.remove('active');
   };
 
+  /* ==========================================================================
+     CONTROL DE VISIBILIDAD DE SECCIÓN DE SUBIDA DE FOTOS
+     ========================================================================== */
+  const openUploadSection = (shouldScroll = true) => {
+    if (!uploadSection) return;
+    uploadSection.style.display = 'block';
+    void uploadSection.offsetWidth; // Forzar reflow
+    uploadSection.classList.add('active');
+
+    if (shouldScroll) {
+      setTimeout(() => {
+        uploadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+    }
+  };
+
+  const closeUploadSection = () => {
+    if (!uploadSection) return;
+    uploadSection.classList.remove('active');
+    uploadSection.style.display = 'none';
+  };
+
+  const toggleUploadSection = () => {
+    if (!uploadSection) return;
+    const isVisible = uploadSection.classList.contains('active') || window.getComputedStyle(uploadSection).display !== 'none';
+    if (isVisible) {
+      closeUploadSection();
+    } else {
+      openUploadSection(true);
+    }
+  };
+
+  if (uploadToggleBtn) {
+    uploadToggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleUploadSection();
+    });
+  }
+
+  if (uploadCloseBtn) {
+    uploadCloseBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeUploadSection();
+    });
+  }
+
   if (uploadForm) {
     uploadForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -386,6 +435,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Notificar y re-renderizar
       showToast('¡Gracias ' + escapeHtml(name) + '! Tu foto ha sido compartida con Sofía. ✨', 'success');
       renderGallery();
+
+      // Ocultar sección de subida al terminar
+      closeUploadSection();
 
       // Desplazarse suavemente hacia la galería
       const galleryAnchor = document.getElementById('gallery-section');

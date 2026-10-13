@@ -58,7 +58,7 @@
         </p>
 
         <div class="album-quick-buttons">
-            <a href="#upload-section" class="btn-cta btn-luxury">
+            <a href="#upload-section" class="btn-cta btn-luxury" id="btn-toggle-upload">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                     <circle cx="12" cy="13" r="4"></circle>
@@ -83,9 +83,10 @@
         <div class="divider-line"></div>
     </div>
 
-    <!-- SECCIÓN 1: FORMULARIO DE SUBIDA DE FOTOS -->
+    <!-- SECCIÓN 1: FORMULARIO DE SUBIDA DE FOTOS (Oculta al entrar al álbum) -->
     <section class="upload-card-container" id="upload-section">
         <div class="upload-glass-card">
+            <button type="button" class="upload-card-close-btn" id="upload-close-btn" title="Cerrar formulario">&times;</button>
             <h2 class="upload-card-title">
                 <span>📸</span> Compartí tu Foto
             </h2>
@@ -151,13 +152,13 @@
                 </div>
             </form>
         </div>
-    </section>
 
-    <div class="decorative-divider">
-        <div class="divider-line"></div>
-        <div class="divider-sparkle">✦</div>
-        <div class="divider-line"></div>
-    </div>
+        <div class="decorative-divider">
+            <div class="divider-line"></div>
+            <div class="divider-sparkle">✦</div>
+            <div class="divider-line"></div>
+        </div>
+    </section>
 
     <!-- SECCIÓN 2: CONTROLES DE GALERÍA (FILTROS Y BÚSQUEDA) -->
     <div class="gallery-controls-container" id="gallery-section">
