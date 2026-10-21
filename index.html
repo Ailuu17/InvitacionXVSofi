@@ -24,7 +24,7 @@
 
     <canvas id="sparkles-canvas"></canvas>
 
-    <audio id="bg-audio" loop preload="auto">
+    <audio id="bg-audio" loop preload="auto" autoplay>
         <!-- //cambiar canción aquí -->
         <source src="assets/audio/musica.mp3" type="audio/mp3">
     </audio>
@@ -381,9 +381,20 @@
             </div>
 
             <section class="closing-section reveal">
-                <div class="closing-photo-frame">
-                    <!-- //cambiar foto quinceañera 2 aquí -->
-                    <img src="assets/img/sofia-2.jpg" alt="Sofía" class="closing-photo" id="quinceanera-photo-2">
+                <div class="closing-photo-frame collage-frame">
+                    <div class="photo-collage-grid">
+                        <div class="collage-item collage-left">
+                            <img src="assets/img/sofia-2.jpeg" alt="Sofía" class="collage-photo collage-bw" id="quinceanera-photo-2">
+                        </div>
+                        <div class="collage-col-right">
+                            <div class="collage-item collage-top-right">
+                                <img src="assets/img/sofia-3.jpeg" alt="Sofía" class="collage-photo">
+                            </div>
+                            <div class="collage-item collage-bottom-right">
+                                <img src="assets/img/sofia-4.jpeg" alt="Sofía" class="collage-photo">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <p class="closing-thanks-text">

@@ -21,7 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Agregar clase para iniciar animaciones CSS del sobre
     envelopeScreen.classList.add('opening');
     
-    // Nota: Comienza sin música (reproducción manual a pedido del usuario)
+    // Asegurar reproducción al interactuar para abrir
+    if (!isMusicPlaying) {
+      playMusic();
+    }
     
     // 2. Remover el sobre del DOM después de la animación para no bloquear scroll
     setTimeout(() => {
@@ -48,15 +51,36 @@ document.addEventListener('DOMContentLoaded', () => {
      ======================================================================== */
 
   const playMusic = () => {
-    bgAudio.play().then(() => {
-      isMusicPlaying = true;
-      updateMusicUI();
-    }).catch(err => {
-      console.log("Reproducción bloqueada por el navegador o error", err);
-      isMusicPlaying = false;
-      updateMusicUI();
+    if (!bgAudio) return;
+    const playPromise = bgAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        isMusicPlaying = true;
+        updateMusicUI();
+      }).catch(err => {
+        console.log("Reproducción automática bloqueada por políticas del navegador. Esperando interacción:", err);
+        isMusicPlaying = false;
+        updateMusicUI();
+      });
+    }
+  };
+
+  // Intentar reproducir automáticamente al cargar la página
+  playMusic();
+
+  // Si las políticas de autoplay del navegador bloquean el audio sin interacción previa,
+  // se iniciará automáticamente ante el primer toque o clic del usuario.
+  const handleFirstInteraction = () => {
+    if (!isMusicPlaying) {
+      playMusic();
+    }
+    ['click', 'touchstart', 'keydown'].forEach(evt => {
+      document.removeEventListener(evt, handleFirstInteraction);
     });
   };
+  ['click', 'touchstart', 'keydown'].forEach(evt => {
+    document.addEventListener(evt, handleFirstInteraction, { passive: true });
+  });
 
   const pauseMusic = () => {
     bgAudio.pause();
