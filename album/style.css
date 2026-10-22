@@ -557,6 +557,100 @@ body.admin-mode .admin-active-badge {
   gap: 20px;
 }
 
+/* Barra de Filtros de Administradora (Active / Archived / All) */
+.admin-filter-bar {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--border-gold);
+  border-radius: 40px;
+  box-shadow: 0 8px 24px rgba(223, 158, 130, 0.2);
+  margin: 0 auto;
+  max-width: 520px;
+  animation: fadeInDown 0.3s ease;
+}
+
+body.admin-mode .admin-filter-bar {
+  display: flex;
+}
+
+.admin-filter-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-status-tabs {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(251, 246, 242, 0.95);
+  padding: 4px;
+  border-radius: 30px;
+  border: 1px solid var(--border-delicate);
+  gap: 4px;
+}
+
+.admin-status-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: var(--font-sans);
+}
+
+.admin-status-tab-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 187, 168, 0.25);
+}
+
+.admin-status-tab-btn.active {
+  background: var(--gold-gradient);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(250, 128, 114, 0.35);
+}
+
+.admin-tab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.dot-active {
+  background: #10b981;
+}
+
+.dot-archived {
+  background: #f59e0b;
+}
+
+.dot-all {
+  background: #fa8072;
+}
+
+.admin-status-tab-btn.active .admin-tab-dot {
+  background: #ffffff;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.9);
+}
+
 .filter-tabs {
   display: flex;
   justify-content: center;
@@ -734,13 +828,23 @@ body.admin-mode .admin-active-badge {
   transform: scale(1);
 }
 
-/* Tag de Categoría sobre la imagen */
-.photo-category-tag {
+/* Contenedor de Tags sobre la imagen (Categoría y Badge de Archivada) */
+.photo-tags-container {
   position: absolute;
   top: 12px;
   left: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.photo-category-tag {
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   color: var(--primary-dark);
   font-size: 0.75rem;
   font-weight: 700;
@@ -750,33 +854,96 @@ body.admin-mode .admin-active-badge {
   border: 1px solid var(--border-delicate);
 }
 
-/* Botón de eliminación solo en Modo Admin */
-.btn-delete-photo {
+/* Badge de foto archivada en modo admin */
+.photo-archived-badge {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  background: rgba(30, 41, 59, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fbbf24;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+body.admin-mode .photo-archived-badge {
+  display: inline-flex;
+}
+
+/* Contenedor de acciones de Administradora (Archivar y Eliminar) */
+.admin-photo-actions {
   display: none;
   position: absolute;
   top: 12px;
   right: 12px;
-  background: #e06355;
-  color: #ffffff;
+  gap: 8px;
+  z-index: 12;
+}
+
+body.admin-mode .admin-photo-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-admin-action {
   border: none;
   width: 34px;
   height: 34px;
   border-radius: 50%;
   cursor: pointer;
   z-index: 10;
-  box-shadow: 0 4px 12px rgba(224, 99, 85, 0.4);
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
   align-items: center;
   justify-content: center;
 }
 
-body.admin-mode .btn-delete-photo {
-  display: flex;
+/* Botón Archivar */
+.btn-archive-photo {
+  background: #334155;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-archive-photo:hover {
+  background: #1e293b;
+  transform: scale(1.15);
+}
+
+/* Estado cuando la foto ya está archivada */
+.btn-archive-photo.is-archived {
+  background: #d97706;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+}
+
+.btn-archive-photo.is-archived:hover {
+  background: #b45309;
+}
+
+/* Botón de eliminación en Modo Admin */
+.btn-delete-photo {
+  background: #e06355;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(224, 99, 85, 0.4);
 }
 
 .btn-delete-photo:hover {
   background: #c0392b;
   transform: scale(1.15) rotate(5deg);
+}
+
+body.admin-mode .photo-card.is-archived {
+  border: 1.5px dashed rgba(245, 158, 11, 0.7);
+  background: rgba(255, 251, 235, 0.6);
 }
 
 .photo-card-info {

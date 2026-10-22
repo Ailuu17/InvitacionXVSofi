@@ -3,20 +3,25 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // CLAVES DE LOCALSTORAGE
+  // CLAVES DE ALMACENAMIENTO PERSISTENTE
   const STORAGE_KEY_PHOTOS = 'XV_SOFIA_ALBUM_PHOTOS';
   const STORAGE_KEY_LIKES = 'XV_SOFIA_ALBUM_LIKES';
   const STORAGE_KEY_ADMIN = 'XV_SOFIA_ALBUM_ADMIN';
+  const STORAGE_KEY_DELETED = 'XV_SOFIA_ALBUM_DELETED_IDS';
+  const STORAGE_KEY_INITIALIZED = 'XV_SOFIA_ALBUM_INIT_V2';
   const ADMIN_PIN = '1515'; // //cambiar clave de administradora aquí si se desea
 
   // ESTADO DE LA APLICACIÓN
   let photos = [];
+  let deletedPhotoIds = [];
   let userLikes = JSON.parse(localStorage.getItem(STORAGE_KEY_LIKES) || '{}');
   let isAdmin = localStorage.getItem(STORAGE_KEY_ADMIN) === 'true';
+  let adminStatusFilter = 'all'; // 'active' | 'archived' | 'all'
   let currentFilter = 'ALL';
   let currentSearch = '';
   let activeLightboxIndex = -1;
   let selectedFileBase64 = null;
+  let dbHelper = null;
 
   // REFERENCIAS DOM
   const galleryGrid = document.getElementById('gallery-grid');
@@ -35,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Filtros y Búsqueda
   const filterTabs = document.querySelectorAll('.filter-tab-btn');
+  const adminFilterBar = document.getElementById('admin-filter-bar');
+  const adminStatusTabs = document.querySelectorAll('.admin-status-tab-btn');
   const searchInput = document.getElementById('search-input');
 
   // Lightbox DOM
@@ -75,19 +82,207 @@ document.addEventListener('DOMContentLoaded', () => {
   const toastEl = document.getElementById('album-toast');
 
   /* ==========================================================================
+     0. CAPA DE PERSISTENCIA ROBUSTA (IndexedDB + LocalStorage)
+     ========================================================================== */
+  const initIndexedDB = () => new Promise((resolve) => {
+    if (!window.indexedDB) {
+      resolve(null);
+      return;
+    }
+    try {
+      const request = window.indexedDB.open('XV_SOFIA_ALBUM_DB', 1);
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('photos')) {
+          db.createObjectStore('photos', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('meta')) {
+          db.createObjectStore('meta', { keyPath: 'key' });
+        }
+      };
+      request.onsuccess = (e) => resolve(e.target.result);
+      request.onerror = () => resolve(null);
+    } catch (e) {
+      resolve(null);
+    }
+  });
+
+  const idbGetAllPhotos = (db) => new Promise((resolve) => {
+    if (!db) { resolve([]); return; }
+    try {
+      const tx = db.transaction('photos', 'readonly');
+      const store = tx.objectStore('photos');
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    } catch (e) {
+      resolve([]);
+    }
+  });
+
+  const idbSaveAllPhotos = (db, photosList) => new Promise((resolve) => {
+    if (!db) { resolve(false); return; }
+    try {
+      const tx = db.transaction('photos', 'readwrite');
+      const store = tx.objectStore('photos');
+      store.clear();
+      photosList.forEach(p => store.put(p));
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    } catch (e) {
+      resolve(false);
+    }
+  });
+
+  const idbDeletePhoto = (db, photoId) => new Promise((resolve) => {
+    if (!db) { resolve(false); return; }
+    try {
+      const tx = db.transaction('photos', 'readwrite');
+      const store = tx.objectStore('photos');
+      store.delete(photoId);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    } catch (e) {
+      resolve(false);
+    }
+  });
+
+  const idbSetMeta = (db, key, val) => new Promise((resolve) => {
+    if (!db) { resolve(false); return; }
+    try {
+      const tx = db.transaction('meta', 'readwrite');
+      const store = tx.objectStore('meta');
+      store.put({ key, val });
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    } catch (e) {
+      resolve(false);
+    }
+  });
+
+  const idbGetMeta = (db, key) => new Promise((resolve) => {
+    if (!db) { resolve(null); return; }
+    try {
+      const tx = db.transaction('meta', 'readonly');
+      const store = tx.objectStore('meta');
+      const req = store.get(key);
+      req.onsuccess = () => resolve(req.result ? req.result.val : null);
+      req.onerror = () => resolve(null);
+    } catch (e) {
+      resolve(null);
+    }
+  });
+
+  // Gestión de IDs de fotos eliminadas (persistencia anti-reaparición)
+  const loadDeletedIdsFromStorage = async () => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_DELETED);
+      if (stored) {
+        deletedPhotoIds = JSON.parse(stored);
+      }
+    } catch (e) {
+      deletedPhotoIds = [];
+    }
+
+    if (dbHelper) {
+      const idbDeleted = await idbGetMeta(dbHelper, 'deleted_ids');
+      if (Array.isArray(idbDeleted)) {
+        const merged = Array.from(new Set([...deletedPhotoIds, ...idbDeleted]));
+        deletedPhotoIds = merged;
+      }
+    }
+    if (!Array.isArray(deletedPhotoIds)) {
+      deletedPhotoIds = [];
+    }
+  };
+
+  const saveDeletedIdsToStorage = async () => {
+    try {
+      localStorage.setItem(STORAGE_KEY_DELETED, JSON.stringify(deletedPhotoIds));
+    } catch (e) {
+      console.warn('No se pudo guardar la lista de eliminados en localStorage', e);
+    }
+    if (dbHelper) {
+      await idbSetMeta(dbHelper, 'deleted_ids', deletedPhotoIds);
+    }
+  };
+
+  const savePhotosToStorage = async () => {
+    // Normalizar status en todas las fotos
+    photos.forEach(p => {
+      if (p.status !== 'archived') {
+        p.status = 'active';
+      }
+    });
+
+    try {
+      localStorage.setItem(STORAGE_KEY_PHOTOS, JSON.stringify(photos));
+      localStorage.setItem(STORAGE_KEY_INITIALIZED, 'true');
+    } catch (e) {
+      console.warn('Límite de cuota en LocalStorage alcanzado, guardando en base de datos IndexedDB', e);
+    }
+
+    if (dbHelper) {
+      await idbSaveAllPhotos(dbHelper, photos);
+      await idbSetMeta(dbHelper, 'initialized', true);
+    }
+  };
+
+  // Recarga directa de almacenamiento para confirmar persistencia
+  const refreshAlbumFromStorage = async () => {
+    await loadDeletedIdsFromStorage();
+
+    let loadedPhotos = [];
+    const stored = localStorage.getItem(STORAGE_KEY_PHOTOS);
+    if (stored) {
+      try {
+        loadedPhotos = JSON.parse(stored);
+      } catch (e) {
+        loadedPhotos = [];
+      }
+    }
+
+    if ((!loadedPhotos || loadedPhotos.length === 0) && dbHelper) {
+      loadedPhotos = await idbGetAllPhotos(dbHelper);
+    }
+
+    if (Array.isArray(loadedPhotos)) {
+      // Filtrar fotos eliminadas y asegurar status válido
+      photos = loadedPhotos
+        .filter(p => !deletedPhotoIds.includes(p.id))
+        .map(p => ({
+          ...p,
+          status: p.status === 'archived' ? 'archived' : 'active'
+        }));
+    }
+  };
+
+  /* ==========================================================================
      1. INICIALIZACIÓN Y CARGA DE FOTOS
      ========================================================================== */
   const initAlbum = async () => {
-    // Inicializar canvas de destellos
     initSparklesCanvas();
 
-    // Actualizar clase de admin si ya estaba autenticado
     if (isAdmin) {
       document.body.classList.add('admin-mode');
       updateAdminButtonUI();
     }
 
-    // Cargar fotos desde LocalStorage o desde photos.json
+    // Inicializar IndexedDB
+    dbHelper = await initIndexedDB();
+
+    // Cargar IDs eliminados
+    await loadDeletedIdsFromStorage();
+
+    // Comprobar si el álbum ya fue inicializado alguna vez
+    const isInitLocalStorage = localStorage.getItem(STORAGE_KEY_INITIALIZED) === 'true';
+    let isInitIdb = false;
+    if (dbHelper) {
+      isInitIdb = (await idbGetMeta(dbHelper, 'initialized')) === true;
+    }
+    const isInitialized = isInitLocalStorage || isInitIdb;
+
+    // Cargar fotos desde LocalStorage
     const storedPhotos = localStorage.getItem(STORAGE_KEY_PHOTOS);
     if (storedPhotos) {
       try {
@@ -98,8 +293,26 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Si no hay fotos guardadas, cargar JSON por defecto
-    if (!photos || photos.length === 0) {
+    // Si LocalStorage está vacío, intentar recuperar desde IndexedDB
+    if ((!photos || photos.length === 0) && dbHelper) {
+      photos = await idbGetAllPhotos(dbHelper);
+    }
+
+    // Limpiar cualquier foto que figure en la lista negra de eliminadas
+    if (Array.isArray(photos)) {
+      photos = photos
+        .filter(p => !deletedPhotoIds.includes(p.id))
+        .map(p => ({
+          ...p,
+          status: p.status === 'archived' ? 'archived' : 'active'
+        }));
+    } else {
+      photos = [];
+    }
+
+    // Solo cargar fotos por defecto si el álbum NUNCA se inicializó antes
+    // (si ya se inicializó y está vacío, significa que el admin eliminó todas las fotos deliberadamente)
+    if (!isInitialized && photos.length === 0) {
       await loadDefaultPhotos();
     }
 
@@ -107,18 +320,28 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const loadDefaultPhotos = async () => {
+    let rawPhotos = [];
     try {
       const response = await fetch('photos.json');
       if (response.ok) {
-        photos = await response.json();
+        rawPhotos = await response.json();
       } else {
-        photos = getFallbackPhotos();
+        rawPhotos = getFallbackPhotos();
       }
     } catch (err) {
       console.warn('Usando fotos por defecto locales', err);
-      photos = getFallbackPhotos();
+      rawPhotos = getFallbackPhotos();
     }
-    savePhotosToStorage();
+
+    // NUNCA cargar una foto por defecto si fue previamente eliminada por el admin
+    photos = rawPhotos
+      .filter(p => !deletedPhotoIds.includes(p.id))
+      .map(p => ({
+        ...p,
+        status: p.status === 'archived' ? 'archived' : 'active'
+      }));
+
+    await savePhotosToStorage();
   };
 
   // //cambiar imagen aquí: Lista de imágenes por defecto con sus rutas
@@ -130,7 +353,8 @@ document.addEventListener('DOMContentLoaded', () => {
       category: 'Quinceañera',
       caption: '¡Preparándome para esta noche soñada! ✨',
       likes: 24,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      status: 'active'
     },
     {
       id: 'photo-default-2',
@@ -139,7 +363,8 @@ document.addEventListener('DOMContentLoaded', () => {
       category: 'Fiesta & Baile',
       caption: 'El salón EL RECREO listo para festejar 💖',
       likes: 18,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      status: 'active'
     },
     {
       id: 'photo-default-3',
@@ -148,7 +373,8 @@ document.addEventListener('DOMContentLoaded', () => {
       category: 'Momentos Inolvidables',
       caption: 'Un recuerdo lleno de amor y alegría 🌹',
       likes: 31,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      status: 'active'
     },
     {
       id: 'photo-default-4',
@@ -157,28 +383,32 @@ document.addEventListener('DOMContentLoaded', () => {
       category: 'Con Sofía',
       caption: '¡Con la cumpleañera más linda! 🎉',
       likes: 15,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      status: 'active'
     }
   ];
 
-  const savePhotosToStorage = () => {
-    try {
-      localStorage.setItem(STORAGE_KEY_PHOTOS, JSON.stringify(photos));
-    } catch (e) {
-      showToast('No hay suficiente espacio en el navegador para guardar la imagen.', 'danger');
-    }
-  };
-
   /* ==========================================================================
-     2. RENDERIZADO DE LA GALERÍA
+     2. LÓGICA DE VISIBILIDAD Y RENDERIZADO DE LA GALERÍA
      ========================================================================== */
-  const renderGallery = () => {
-    if (!galleryGrid) return;
-    galleryGrid.innerHTML = '';
+  // Obtener la lista de fotos visibles según el rol y filtros activos
+  const getVisiblePhotos = () => {
+    return photos.filter(photo => {
+      // 1. Regla de visibilidad por Estado (Active / Archived)
+      if (!isAdmin) {
+        // Invitados públicos: SOLO ven fotos con status="active"
+        if (photo.status !== 'active') return false;
+      } else {
+        // Administradora: filtros Active / Archived / All
+        if (adminStatusFilter === 'active' && photo.status !== 'active') return false;
+        if (adminStatusFilter === 'archived' && photo.status !== 'archived') return false;
+        // Si adminStatusFilter === 'all', se muestran tanto 'active' como 'archived'
+      }
 
-    // Filtrar fotos por categoría y término de búsqueda
-    const filtered = photos.filter(photo => {
+      // 2. Filtro de Categoría
       const matchCategory = (currentFilter === 'ALL') || (photo.category === currentFilter);
+
+      // 3. Filtro de Búsqueda
       const searchLower = currentSearch.toLowerCase();
       const matchSearch = !currentSearch ||
         (photo.author && photo.author.toLowerCase().includes(searchLower)) ||
@@ -187,35 +417,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
       return matchCategory && matchSearch;
     });
+  };
 
-    if (filtered.length === 0) {
+  const renderGallery = () => {
+    if (!galleryGrid) return;
+    galleryGrid.innerHTML = '';
+
+    const visiblePhotos = getVisiblePhotos();
+
+    if (visiblePhotos.length === 0) {
+      let emptyMsg = 'Aún no hay fotos en esta sección';
+      let emptySub = '¡Sé el primero en compartir un hermoso recuerdo de la fiesta!';
+      if (isAdmin && adminStatusFilter === 'archived') {
+        emptyMsg = 'No hay fotos archivadas';
+        emptySub = 'Las fotos que archives desde el modo administradora aparecerán aquí.';
+      } else if (currentSearch) {
+        emptyMsg = 'No se encontraron resultados';
+        emptySub = 'Probá con otro nombre de invitado o palabra clave.';
+      }
+
       galleryGrid.innerHTML = `
         <div class="empty-gallery-box">
           <div class="empty-gallery-icon">📷</div>
-          <h4 class="empty-gallery-title">Aún no hay fotos en esta sección</h4>
-          <p class="empty-gallery-text">¡Sé el primero en compartir un hermoso recuerdo de la fiesta!</p>
+          <h4 class="empty-gallery-title">${escapeHtml(emptyMsg)}</h4>
+          <p class="empty-gallery-text">${escapeHtml(emptySub)}</p>
         </div>
       `;
       return;
     }
 
-    filtered.forEach((photo, index) => {
+    visiblePhotos.forEach((photo) => {
       const isLiked = !!userLikes[photo.id];
+      const isArchived = photo.status === 'archived';
       const card = document.createElement('div');
-      card.className = 'photo-card';
+      card.className = `photo-card ${isArchived ? 'is-archived' : ''}`;
 
-      // //cambiar imagen aquí: Foto renderedizada en la tarjeta
+      // Renderizado de tarjeta con badges y botones de admin
       card.innerHTML = `
         <div class="photo-img-wrapper" data-id="${photo.id}">
           <img src="${photo.url}" alt="Foto subida por ${escapeHtml(photo.author)}" class="photo-img" loading="lazy">
-          <span class="photo-category-tag">${escapeHtml(photo.category || 'General')}</span>
           
-          <button type="button" class="btn-delete-photo" data-id="${photo.id}" title="Eliminar foto (Admin)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
-          </button>
+          <div class="photo-tags-container">
+            <span class="photo-category-tag">${escapeHtml(photo.category || 'General')}</span>
+            ${isArchived ? `<span class="photo-archived-badge" title="Foto archivada (Solo visible en Modo Administradora)">📦 Archived</span>` : ''}
+          </div>
+
+          <!-- Acciones de Administradora (Archivar y Eliminar) -->
+          <div class="admin-photo-actions">
+            <button type="button" class="btn-admin-action btn-archive-photo ${isArchived ? 'is-archived' : ''}" data-id="${photo.id}" title="${isArchived ? 'Desarchivar foto (Hacer pública)' : 'Archivar foto (Ocultar del público)'}">
+              ${isArchived ? `
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                </svg>
+              ` : `
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                  <rect x="1" y="3" width="22" height="5"></rect>
+                  <line x1="10" y1="12" x2="14" y2="12"></line>
+                </svg>
+              `}
+            </button>
+            <button type="button" class="btn-admin-action btn-delete-photo" data-id="${photo.id}" title="Eliminar foto permanentemente (Admin)">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
 
           <div class="photo-overlay-view">
             <span class="view-zoom-badge">
@@ -250,21 +520,30 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
 
-      // Event listener para abrir lightbox al presionar la imagen
+      // Click en imagen abre el lightbox
       const imgWrapper = card.querySelector('.photo-img-wrapper');
       imgWrapper.addEventListener('click', (e) => {
-        if (e.target.closest('.btn-delete-photo')) return; // No abrir lightbox si hizo click en borrar
+        if (e.target.closest('.admin-photo-actions')) return;
         openLightbox(photo.id);
       });
 
-      // Event listener para dar Me Gusta
+      // Evento Me Gusta
       const likeBtn = card.querySelector('.btn-like-heart');
       likeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleLike(photo.id);
       });
 
-      // Event listener para eliminar foto
+      // Evento Archivar / Desarchivar (Solo Admin)
+      const archiveBtn = card.querySelector('.btn-archive-photo');
+      if (archiveBtn) {
+        archiveBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleArchivePhoto(photo.id);
+        });
+      }
+
+      // Evento Eliminar Foto (Solo Admin)
       const deleteBtn = card.querySelector('.btn-delete-photo');
       if (deleteBtn) {
         deleteBtn.addEventListener('click', (e) => {
@@ -281,10 +560,8 @@ document.addEventListener('DOMContentLoaded', () => {
      3. SUBIDA Y DROPZONE DE IMÁGENES
      ========================================================================== */
   if (dropzone && fileInput) {
-    // Click en el área activa el selector de archivos
     dropzone.addEventListener('click', () => fileInput.click());
 
-    // Drag & Drop
     ['dragenter', 'dragover'].forEach(eventName => {
       dropzone.addEventListener(eventName, (e) => {
         e.preventDefault();
@@ -315,11 +592,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const handleFileSelect = (file) => {
     if (!file.type.startsWith('image/')) {
-      showToast('Por favor, selecciona un archivo de imagen válido (JPG, PNG, GIF).', 'danger');
+      showToast('Por favor, selecciona un archivo de imagen válido (JPG, PNG, GIF, WEBP).', 'danger');
       return;
     }
 
-    // Validar tamaño máximo (p. ej. 8MB)
     if (file.size > 8 * 1024 * 1024) {
       showToast('La imagen supera el límite de 8MB.', 'danger');
       return;
@@ -356,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const openUploadSection = (shouldScroll = true) => {
     if (!uploadSection) return;
     uploadSection.style.display = 'block';
-    void uploadSection.offsetWidth; // Forzar reflow
+    void uploadSection.offsetWidth;
     uploadSection.classList.add('active');
 
     if (shouldScroll) {
@@ -397,7 +673,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (uploadForm) {
-    uploadForm.addEventListener('submit', (e) => {
+    uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const name = guestNameInput.value.trim();
@@ -414,32 +690,28 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // Las fotos nuevas siempre nacen con status='active' (visibles para todos)
       const newPhoto = {
         id: 'photo-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
-        url: selectedFileBase64, // //cambiar imagen aquí (imagen guardada en base64)
+        url: selectedFileBase64,
         author: name,
         category: category,
         caption: caption,
         likes: 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        status: 'active'
       };
 
-      // Agregar al inicio del arreglo
       photos.unshift(newPhoto);
-      savePhotosToStorage();
+      await savePhotosToStorage();
 
-      // Resetear formulario
       uploadForm.reset();
       resetUploadPreview();
 
-      // Notificar y re-renderizar
       showToast('¡Gracias ' + escapeHtml(name) + '! Tu foto ha sido compartida con Sofía. ✨', 'success');
       renderGallery();
-
-      // Ocultar sección de subida al terminar
       closeUploadSection();
 
-      // Desplazarse suavemente hacia la galería
       const galleryAnchor = document.getElementById('gallery-section');
       if (galleryAnchor) {
         galleryAnchor.scrollIntoView({ behavior: 'smooth' });
@@ -448,9 +720,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ==========================================================================
-     4. ME GUSTA Y ELIMINACIÓN DE FOTOS
+     4. ACCIONES DE ADMINISTRADORA: ARCHIVAR Y ELIMINAR FOTOS
      ========================================================================== */
-  const toggleLike = (photoId) => {
+  const toggleLike = async (photoId) => {
     const photo = photos.find(p => p.id === photoId);
     if (!photo) return;
 
@@ -463,15 +735,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     localStorage.setItem(STORAGE_KEY_LIKES, JSON.stringify(userLikes));
-    savePhotosToStorage();
+    await savePhotosToStorage();
     renderGallery();
 
-    // Actualizar si el lightbox está abierto
-    if (activeLightboxIndex !== -1 && photos[activeLightboxIndex] && photos[activeLightboxIndex].id === photoId) {
-      updateLightboxContent(photos[activeLightboxIndex]);
+    const visiblePhotos = getVisiblePhotos();
+    if (activeLightboxIndex !== -1 && visiblePhotos[activeLightboxIndex] && visiblePhotos[activeLightboxIndex].id === photoId) {
+      updateLightboxContent(visiblePhotos[activeLightboxIndex]);
     }
   };
 
+  // Archivar o Desarchivar una foto
+  const toggleArchivePhoto = async (photoId) => {
+    if (!isAdmin) {
+      showToast('Debes ser administradora para archivar fotos.', 'danger');
+      return;
+    }
+
+    const photo = photos.find(p => p.id === photoId);
+    if (!photo) return;
+
+    const isCurrentlyArchived = photo.status === 'archived';
+    photo.status = isCurrentlyArchived ? 'active' : 'archived';
+
+    await savePhotosToStorage();
+    await refreshAlbumFromStorage();
+
+    const toastMsg = photo.status === 'archived'
+      ? 'Foto archivada 📦 Ahora solo es visible en modo administradora.'
+      : 'Foto desarchivada ✨ Ahora es visible públicamente para todos.';
+    showToast(toastMsg, 'success');
+
+    renderGallery();
+
+    // Si el lightbox estaba abierto mostrando esta foto, actualizar visor
+    const visiblePhotos = getVisiblePhotos();
+    if (activeLightboxIndex !== -1 && visiblePhotos[activeLightboxIndex]) {
+      updateLightboxContent(visiblePhotos[activeLightboxIndex]);
+    }
+  };
+
+  // Apertura de modal de eliminación permanente
   const openDeletePhotoModal = (photoId) => {
     photoToDeleteId = photoId;
     if (deletePhotoModal) {
@@ -494,12 +797,38 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Confirmar eliminación permanente de la foto
   if (deleteConfirmBtn) {
-    deleteConfirmBtn.addEventListener('click', () => {
-      if (photoToDeleteId) {
-        photos = photos.filter(p => p.id !== photoToDeleteId);
-        savePhotosToStorage();
-        showToast('Foto eliminada correctamente 🗑️', 'success');
+    deleteConfirmBtn.addEventListener('click', async () => {
+      if (photoToDeleteId && isAdmin) {
+        const idToDelete = photoToDeleteId;
+
+        // 1. Añadir a la lista de fotos eliminadas persistentemente
+        if (!deletedPhotoIds.includes(idToDelete)) {
+          deletedPhotoIds.push(idToDelete);
+        }
+        await saveDeletedIdsToStorage();
+
+        // 2. Remover del array de fotos en memoria
+        photos = photos.filter(p => p.id !== idToDelete);
+
+        // 3. Remover de almacenamiento permanente (LocalStorage e IndexedDB)
+        await savePhotosToStorage();
+
+        if (dbHelper) {
+          await idbDeletePhoto(dbHelper, idToDelete);
+        }
+
+        // 4. Limpiar Me Gusta
+        if (userLikes[idToDelete]) {
+          delete userLikes[idToDelete];
+          localStorage.setItem(STORAGE_KEY_LIKES, JSON.stringify(userLikes));
+        }
+
+        // 5. Refrescar el álbum desde el almacenamiento para confirmar la persistencia
+        await refreshAlbumFromStorage();
+
+        showToast('Foto eliminada permanentemente del álbum 🗑️', 'success');
         renderGallery();
 
         if (lightboxModal && lightboxModal.classList.contains('active')) {
@@ -521,11 +850,22 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      5. FILTROS Y BÚSQUEDA
      ========================================================================== */
+  // Pestañas de categoría de invitados
   filterTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       filterTabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       currentFilter = tab.getAttribute('data-filter');
+      renderGallery();
+    });
+  });
+
+  // Pestañas de estado exclusivas de Administradora: [Active] [Archived] [All]
+  adminStatusTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      adminStatusTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      adminStatusFilter = tab.getAttribute('data-status') || 'all';
       renderGallery();
     });
   });
@@ -541,11 +881,12 @@ document.addEventListener('DOMContentLoaded', () => {
      6. MODAL LIGHTBOX
      ========================================================================== */
   const openLightbox = (photoId) => {
-    const index = photos.findIndex(p => p.id === photoId);
+    const visiblePhotos = getVisiblePhotos();
+    const index = visiblePhotos.findIndex(p => p.id === photoId);
     if (index === -1) return;
 
     activeLightboxIndex = index;
-    updateLightboxContent(photos[activeLightboxIndex]);
+    updateLightboxContent(visiblePhotos[activeLightboxIndex]);
     lightboxModal.classList.add('active');
     document.body.style.overflow = 'hidden';
   };
@@ -553,10 +894,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const updateLightboxContent = (photo) => {
     if (!photo) return;
     const isLiked = !!userLikes[photo.id];
+    const isArchived = photo.status === 'archived';
 
-    lightboxImg.src = photo.url; // //cambiar imagen aquí
+    lightboxImg.src = photo.url;
     lightboxUploader.textContent = photo.author || 'Invitado';
-    lightboxCategory.textContent = photo.category || 'General';
+
+    let categoryText = photo.category || 'General';
+    if (isAdmin && isArchived) {
+      categoryText += ' • 📦 ARCHIVADA';
+    }
+    lightboxCategory.textContent = categoryText;
+
     lightboxCaption.textContent = photo.caption || '';
     lightboxDate.textContent = formatDate(photo.timestamp);
     lightboxLikeCount.textContent = photo.likes || 0;
@@ -577,15 +925,17 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const nextLightboxPhoto = () => {
-    if (photos.length === 0) return;
-    activeLightboxIndex = (activeLightboxIndex + 1) % photos.length;
-    updateLightboxContent(photos[activeLightboxIndex]);
+    const visiblePhotos = getVisiblePhotos();
+    if (visiblePhotos.length === 0) return;
+    activeLightboxIndex = (activeLightboxIndex + 1) % visiblePhotos.length;
+    updateLightboxContent(visiblePhotos[activeLightboxIndex]);
   };
 
   const prevLightboxPhoto = () => {
-    if (photos.length === 0) return;
-    activeLightboxIndex = (activeLightboxIndex - 1 + photos.length) % photos.length;
-    updateLightboxContent(photos[activeLightboxIndex]);
+    const visiblePhotos = getVisiblePhotos();
+    if (visiblePhotos.length === 0) return;
+    activeLightboxIndex = (activeLightboxIndex - 1 + visiblePhotos.length) % visiblePhotos.length;
+    updateLightboxContent(visiblePhotos[activeLightboxIndex]);
   };
 
   if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
@@ -645,6 +995,9 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.remove('admin-mode');
       updateAdminButtonUI();
       closeAdminExitModal();
+
+      // Resetear filtro admin a active por defecto
+      adminStatusFilter = 'all';
       showToast('Has salido del modo administradora.', 'info');
       renderGallery();
     });
@@ -653,10 +1006,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (adminToggleBtn) {
     adminToggleBtn.addEventListener('click', () => {
       if (isAdmin) {
-        // Abrir modal estético de confirmación para salir
         openAdminExitModal();
       } else {
-        // Abrir modal de PIN
         openAdminModal();
       }
     });
@@ -692,6 +1043,17 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.add('admin-mode');
       updateAdminButtonUI();
       closeAdminModal();
+
+      // Por defecto en admin: All para ver activas y archivadas
+      adminStatusFilter = 'all';
+      adminStatusTabs.forEach(t => {
+        if (t.getAttribute('data-status') === 'all') {
+          t.classList.add('active');
+        } else {
+          t.classList.remove('active');
+        }
+      });
+
       showToast('¡Bienvenida Sofía! Modo Administradora activado 👑', 'success');
       renderGallery();
     } else {

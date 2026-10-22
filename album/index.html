@@ -163,6 +163,28 @@
 
     <!-- SECCIÓN 2: CONTROLES DE GALERÍA (FILTROS Y BÚSQUEDA) -->
     <div class="gallery-controls-container" id="gallery-section">
+        <!-- Barra de filtros exclusivos de Administradora (Active / Archived / All) -->
+        <div class="admin-filter-bar" id="admin-filter-bar">
+            <div class="admin-filter-label">
+                <span class="admin-filter-icon">👑</span>
+                <span>Filtro Administradora:</span>
+            </div>
+            <div class="admin-status-tabs" role="tablist" aria-label="Filtro de estado de fotos">
+                <button type="button" class="admin-status-tab-btn" data-status="active" title="Ver solo fotos activas">
+                    <span class="admin-tab-dot dot-active"></span>
+                    <span>Active</span>
+                </button>
+                <button type="button" class="admin-status-tab-btn" data-status="archived" title="Ver fotos archivadas">
+                    <span class="admin-tab-dot dot-archived"></span>
+                    <span>Archived</span>
+                </button>
+                <button type="button" class="admin-status-tab-btn active" data-status="all" title="Ver todas las fotos (activas y archivadas)">
+                    <span class="admin-tab-dot dot-all"></span>
+                    <span>All</span>
+                </button>
+            </div>
+        </div>
+
         <div class="filter-tabs">
             <button type="button" class="filter-tab-btn active" data-filter="ALL">Todas las fotos</button>
             <button type="button" class="filter-tab-btn" data-filter="Quinceañera">✨ Quinceañera</button>
