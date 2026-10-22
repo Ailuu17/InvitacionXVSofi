@@ -1003,6 +1003,14 @@ body {
   transform: scale(1.04);
 }
 
+/* // cambiar collage-size acá */
+.closing-photo-frame.collage-frame {
+  max-width: 440px;
+  /* cambiar collage-size acá */
+  height: 420px;
+  /* cambiar collage-size acá */
+}
+
 /* Collage de 3 fotos de Sofía */
 .photo-collage-grid {
   display: flex;
@@ -1019,14 +1027,14 @@ body {
 }
 
 .collage-left {
-  flex: 0 0 calc(65% - 2px);
-  width: calc(65% - 2px);
+  flex: 0 0 calc(55% - 2px);
+  width: calc(55% - 2px);
   height: 100%;
 }
 
 .collage-col-right {
-  flex: 0 0 calc(35% - 2px);
-  width: calc(35% - 2px);
+  flex: 0 0 calc(45% - 2px);
+  width: calc(45% - 2px);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -1034,13 +1042,13 @@ body {
 }
 
 .collage-top-right {
-  flex: 0 0 calc(62% - 2px);
-  height: calc(62% - 2px);
+  flex: 0 0 calc(55% - 2px);
+  height: calc(55% - 2px);
 }
 
 .collage-bottom-right {
-  flex: 0 0 calc(38% - 2px);
-  height: calc(38% - 2px);
+  flex: 0 0 calc(45% - 2px);
+  height: calc(45% - 2px);
 }
 
 .collage-photo {
@@ -1218,22 +1226,28 @@ body {
 
 /* Animación sutil y atractiva cuando está pausado para llamar la atención */
 @keyframes musicAttentionBounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) scale(1) rotate(0deg);
     box-shadow: 0 6px 20px rgba(250, 128, 114, 0.4);
   }
+
   20% {
     transform: translateY(-4px) scale(1.05) rotate(-3deg);
     box-shadow: 0 10px 24px rgba(250, 128, 114, 0.55);
   }
+
   35% {
     transform: translateY(0) scale(1.02) rotate(2deg);
     box-shadow: 0 7px 20px rgba(250, 128, 114, 0.45);
   }
+
   45% {
     transform: translateY(-2px) scale(1.04) rotate(-1deg);
     box-shadow: 0 9px 22px rgba(250, 128, 114, 0.5);
   }
+
   55% {
     transform: translateY(0) scale(1) rotate(0deg);
     box-shadow: 0 6px 20px rgba(250, 128, 114, 0.4);
