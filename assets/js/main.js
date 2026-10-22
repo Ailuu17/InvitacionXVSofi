@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Agregar clase para iniciar animaciones CSS del sobre
     envelopeScreen.classList.add('opening');
     
-    // Asegurar reproducción al interactuar para abrir
+    // Iniciar música únicamente cuando se abre el sobre
     if (!isMusicPlaying) {
       playMusic();
     }
@@ -65,23 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Intentar reproducir automáticamente al cargar la página
-  playMusic();
-
-  // Si las políticas de autoplay del navegador bloquean el audio sin interacción previa,
-  // se iniciará automáticamente ante el primer toque o clic del usuario.
-  const handleFirstInteraction = () => {
-    if (!isMusicPlaying) {
-      playMusic();
-    }
-    ['click', 'touchstart', 'keydown'].forEach(evt => {
-      document.removeEventListener(evt, handleFirstInteraction);
-    });
-  };
-  ['click', 'touchstart', 'keydown'].forEach(evt => {
-    document.addEventListener(evt, handleFirstInteraction, { passive: true });
-  });
-
   const pauseMusic = () => {
     bgAudio.pause();
     isMusicPlaying = false;
@@ -89,6 +72,11 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const toggleMusic = () => {
+    const envelopeHasOpened = envelopeScreen && envelopeScreen.style.display === 'none';
+    if (!envelopeHasOpened && !isMusicPlaying) {
+      return;
+    }
+
     if (isMusicPlaying) {
       pauseMusic();
     } else {
