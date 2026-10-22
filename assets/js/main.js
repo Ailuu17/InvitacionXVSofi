@@ -154,37 +154,11 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   
   /* ========================================================================
-     4. MODAL DATOS DE REGALO (PREX) Y COPIAR AL PORTAPAPELES
+     4. COPIAR DATOS DE REGALO (PREX) AL PORTAPAPELES
      ======================================================================== */
-  const openModalBtn = document.getElementById('open-gift-modal-btn');
-  const closeModalBtn = document.getElementById('close-gift-modal-btn');
-  const giftModal = document.getElementById('gift-modal');
   const copyPrexBtn = document.getElementById('copy-prex-btn');
   const prexNumberVal = document.getElementById('prex-number-val');
   const copyToast = document.getElementById('copy-toast');
-  
-  if(openModalBtn && giftModal) {
-    openModalBtn.addEventListener('click', () => {
-      giftModal.classList.add('active');
-      document.body.style.overflow = 'hidden'; // Evitar scroll de fondo
-    });
-  }
-  
-  const closeGiftModal = () => {
-    giftModal.classList.remove('active');
-    document.body.style.overflow = 'auto';
-  };
-  
-  if(closeModalBtn) closeModalBtn.addEventListener('click', closeGiftModal);
-  
-  // Cerrar al clickear fuera de la tarjeta
-  if(giftModal) {
-    giftModal.addEventListener('click', (e) => {
-      if(e.target === giftModal) {
-        closeGiftModal();
-      }
-    });
-  }
   
   // Copiar datos
   if(copyPrexBtn && prexNumberVal) {

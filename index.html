@@ -262,18 +262,11 @@
                 </div>
 
                 <h3 class="dresscode-title">Vestimenta formal.</h3>
-                <p class="dresscode-reserved-note">Se reservan para la quinceañera y la familia los colores: blanco,
-                    celestes y azules.</p>
+                <p class="dresscode-reserved-note">Se reserva para la quinceañera el color: </p>
 
                 <div class="colors-reserved-pills">
                     <div class="color-pill">
                         <span class="color-dot white"></span> Blanco
-                    </div>
-                    <div class="color-pill">
-                        <span class="color-dot light-blue"></span> Celestes
-                    </div>
-                    <div class="color-pill">
-                        <span class="color-dot blue"></span> Azules
                     </div>
                 </div>
             </section>
@@ -302,6 +295,12 @@
                 </a>
             </section>
 
+            <div class="decorative-divider">
+                <div class="divider-line"></div>
+                <div class="divider-sparkle">✦</div>
+                <div class="divider-line"></div>
+            </div>
+
             <section class="gift-section reveal">
                 <div class="section-icon-circle">
                     <!-- //cambiar imagen regalo aquí -->
@@ -314,10 +313,34 @@
                     sueños y anhelos✨ ¡Muchas gracias!
                 </p>
 
-                <button type="button" class="btn-cta btn-luxury" id="open-gift-modal-btn">
-                    <img src="assets/img/datos-bancarios.png" alt="Datos bancarios">
-                    Datos bancarios
-                </button>
+                <!-- //cambiar datos de tarjeta Prex aquí -->
+                <div class="gift-card-box">
+                    <h4 class="bank-data-title">Datos Bancarios</h4>
+                    <p class="modal-subtitle">Podés realizar una transferencia a la siguiente cuenta Prex ($ y USD):</p>
+
+                    <div class="prex-card-display">
+                        <!-- //cambiar datos de tarjeta Prex aquí -->
+                        <div class="prex-logo-badge">PREX URUGUAY</div>
+
+                        <div class="prex-data-row">
+                            <div class="prex-data-label">Número Cuenta</div>
+                            <div class="prex-data-value" id="prex-number-val">2423 7877</div>
+                        </div>
+
+                        <div class="prex-data-row">
+                            <div class="prex-data-label">Titular</div>
+                            <div class="prex-data-name" id="prex-holder-val">Sofía Waller</div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-cta btn-luxury" id="copy-prex-btn" style="width: 100%;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Copiar Número
+                    </button>
+                </div>
             </section>
 
             <div class="decorative-divider">
@@ -410,46 +433,6 @@
 
         </div>
     </main>
-
-    <!-- //cambiar datos de tarjeta Prex aquí -->
-    <div class="gift-modal-backdrop" id="gift-modal" role="dialog" aria-modal="true">
-        <div class="gift-modal-card">
-            <button type="button" class="modal-close-btn" id="close-gift-modal-btn" title="Cerrar">&times;</button>
-
-            <div class="modal-header-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fa8072" stroke-width="2">
-                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                    <line x1="2" y1="10" x2="22" y2="10"></line>
-                </svg>
-            </div>
-
-            <h3 class="modal-title">Datos para el Regalo</h3>
-            <p class="modal-subtitle">Podés realizar una transferencia a la siguiente cuenta Prex ($ y USD):</p>
-
-            <div class="prex-card-display">
-                <!-- //cambiar datos de tarjeta Prex aquí -->
-                <div class="prex-logo-badge">PREX URUGUAY</div>
-
-                <div class="prex-data-row">
-                    <div class="prex-data-label">Número Cuenta</div>
-                    <div class="prex-data-value" id="prex-number-val">2423 7877</div>
-                </div>
-
-                <div class="prex-data-row">
-                    <div class="prex-data-label">Titular</div>
-                    <div class="prex-data-name" id="prex-holder-val">Sofía Waller</div>
-                </div>
-            </div>
-
-            <button type="button" class="btn-cta btn-luxury" id="copy-prex-btn" style="width: 100%;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-                Copiar Número
-            </button>
-        </div>
-    </div>
 
     <div class="copy-toast" id="copy-toast">¡Copiado con éxito!</div>
 
