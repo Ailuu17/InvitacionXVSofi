@@ -21,7 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSearch = '';
   let activeLightboxIndex = -1;
   let selectedFileBase64 = null;
+  let selectedFile = null;
+  let isUploading = false;
   let dbHelper = null;
+  let supabase = null;
+  let supabaseInitializationError = null;
+  const albumConfig = window.XV_SOFIA_ALBUM_CONFIG || {};
+  const storageBucket = albumConfig.bucket || 'album-photos';
 
   // REFERENCIAS DOM
   const galleryGrid = document.getElementById('gallery-grid');
@@ -271,6 +277,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar IndexedDB
     dbHelper = await initIndexedDB();
 
+    if (albumConfig.supabaseUrl && albumConfig.supabaseAnonKey) {
+      try {
+        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+        supabase = createClient(albumConfig.supabaseUrl, albumConfig.supabaseAnonKey, {
+          global: {
+            fetch: (input, init) => fetch(input, { ...init, cache: 'no-store' })
+          }
+        });
+      } catch (error) {
+        supabaseInitializationError = error;
+        console.error('No se pudo inicializar Supabase', error);
+        showToast('No se pudo iniciar la conexión con el álbum compartido.', 'danger');
+      }
+    }
+
     // Cargar IDs eliminados
     await loadDeletedIdsFromStorage();
 
@@ -314,6 +335,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // (si ya se inicializó y está vacío, significa que el admin eliminó todas las fotos deliberadamente)
     if (!isInitialized && photos.length === 0) {
       await loadDefaultPhotos();
+    }
+
+    if (supabase) {
+      try {
+        await refreshSharedPhotos();
+        subscribeToSharedPhotos();
+      } catch (error) {
+        console.error('No se pudieron cargar las fotos compartidas', error);
+        showToast('No se pudieron cargar las fotos compartidas. Revisá la conexión y la configuración.', 'danger');
+      }
     }
 
     renderGallery();
@@ -387,6 +418,88 @@ document.addEventListener('DOMContentLoaded', () => {
       status: 'active'
     }
   ];
+
+  const mapSharedPhoto = (photo) => ({
+    ...photo,
+    url: supabase.storage.from(storageBucket).getPublicUrl(photo.storage_path).data.publicUrl,
+    status: photo.status === 'archived' ? 'archived' : 'active'
+  });
+
+  const refreshSharedPhotos = async () => {
+    const { data, error } = await supabase
+      .from('album_photos')
+      .select('id, storage_path, author, category, caption, likes, timestamp, status')
+      .order('timestamp', { ascending: false });
+
+    if (error) throw error;
+
+    const defaultPhotos = photos.filter(photo => photo.id.startsWith('photo-default-'));
+    photos = [...(data || []).map(mapSharedPhoto), ...defaultPhotos];
+    await savePhotosToStorage();
+  };
+
+  const subscribeToSharedPhotos = () => {
+    supabase
+      .channel('shared-album-photos')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'album_photos'
+      }, async () => {
+        try {
+          await refreshSharedPhotos();
+          renderGallery();
+        } catch (error) {
+          console.error('No se pudo actualizar la galería compartida', error);
+          showToast('No se pudo actualizar la galería. Intentá recargar la página.', 'danger');
+        }
+      })
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.error('Falló la suscripción en tiempo real del álbum:', status);
+          showToast('La actualización en tiempo real no está disponible.', 'danger');
+        }
+      });
+  };
+
+  const uploadSharedPhoto = async (photo) => {
+    const extensionByType = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif'
+    };
+    const storagePath = `${photo.id}.${extensionByType[selectedFile.type]}`;
+    const { error: uploadError } = await supabase.storage
+      .from(storageBucket)
+      .upload(storagePath, selectedFile, {
+        cacheControl: '3600',
+        contentType: selectedFile.type,
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data, error: insertError } = await supabase
+      .from('album_photos')
+      .insert({
+        id: photo.id,
+        storage_path: storagePath,
+        author: photo.author,
+        category: photo.category,
+        caption: photo.caption,
+        status: 'active'
+      })
+      .select('id, storage_path, author, category, caption, likes, timestamp, status')
+      .single();
+
+    if (insertError) {
+      console.error('La imagen quedó en Storage sin registro de álbum:', storagePath);
+      throw insertError;
+    }
+
+    return mapSharedPhoto(data);
+  };
 
   /* ==========================================================================
      2. LÓGICA DE VISIBILIDAD Y RENDERIZADO DE LA GALERÍA
@@ -591,23 +704,30 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const handleFileSelect = (file) => {
-    if (!file.type.startsWith('image/')) {
-      showToast('Por favor, selecciona un archivo de imagen válido (JPG, PNG, GIF, WEBP).', 'danger');
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
+      resetUploadPreview();
+      showToast('Seleccioná una imagen JPG, PNG, WEBP o GIF.', 'danger');
       return;
     }
 
     if (file.size > 8 * 1024 * 1024) {
+      resetUploadPreview();
       showToast('La imagen supera el límite de 8MB.', 'danger');
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (e) => {
+      selectedFile = file;
       selectedFileBase64 = e.target.result;
       if (previewImg && previewContainer) {
         previewImg.src = selectedFileBase64;
         previewContainer.classList.add('active');
       }
+    };
+    reader.onerror = () => {
+      resetUploadPreview();
+      showToast('No se pudo leer la imagen seleccionada.', 'danger');
     };
     reader.readAsDataURL(file);
   };
@@ -621,6 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const resetUploadPreview = () => {
     selectedFileBase64 = null;
+    selectedFile = null;
     if (fileInput) fileInput.value = '';
     if (previewImg) previewImg.src = '';
     if (previewContainer) previewContainer.classList.remove('active');
@@ -690,10 +811,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      if (!supabase) {
+        showToast(supabaseInitializationError
+          ? 'No se pudo iniciar la conexión con el álbum compartido.'
+          : 'El álbum compartido todavía no está configurado.', 'danger');
+        return;
+      }
+
+      if (isUploading) return;
+      isUploading = true;
+      const submitButton = uploadForm.querySelector('[type="submit"]');
+      if (submitButton) submitButton.disabled = true;
+
       // Las fotos nuevas siempre nacen con status='active' (visibles para todos)
       const newPhoto = {
         id: 'photo-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
-        url: selectedFileBase64,
         author: name,
         category: category,
         caption: caption,
@@ -702,19 +834,28 @@ document.addEventListener('DOMContentLoaded', () => {
         status: 'active'
       };
 
-      photos.unshift(newPhoto);
-      await savePhotosToStorage();
+      try {
+        const sharedPhoto = await uploadSharedPhoto(newPhoto);
+        photos.unshift(sharedPhoto);
+        await savePhotosToStorage();
 
-      uploadForm.reset();
-      resetUploadPreview();
+        uploadForm.reset();
+        resetUploadPreview();
 
-      showToast('¡Gracias ' + escapeHtml(name) + '! Tu foto ha sido compartida con Sofía. ✨', 'success');
-      renderGallery();
-      closeUploadSection();
+        showToast('¡Gracias ' + escapeHtml(name) + '! Tu foto ha sido compartida con Sofía. ✨', 'success');
+        renderGallery();
+        closeUploadSection();
 
-      const galleryAnchor = document.getElementById('gallery-section');
-      if (galleryAnchor) {
-        galleryAnchor.scrollIntoView({ behavior: 'smooth' });
+        const galleryAnchor = document.getElementById('gallery-section');
+        if (galleryAnchor) {
+          galleryAnchor.scrollIntoView({ behavior: 'smooth' });
+        }
+      } catch (error) {
+        console.error('No se pudo publicar la foto en el álbum compartido', error);
+        showToast('No se pudo publicar la foto: ' + (error.message || 'error de conexión o permisos.'), 'danger');
+      } finally {
+        isUploading = false;
+        if (submitButton) submitButton.disabled = false;
       }
     });
   }
@@ -753,6 +894,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const photo = photos.find(p => p.id === photoId);
     if (!photo) return;
+
+    if (photo.storage_path) {
+      showToast('La administración de fotos compartidas requiere autenticación de administradora en Supabase.', 'danger');
+      return;
+    }
 
     const isCurrentlyArchived = photo.status === 'archived';
     photo.status = isCurrentlyArchived ? 'active' : 'archived';
@@ -842,6 +988,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const deletePhoto = (photoId) => {
     if (!isAdmin) {
       showToast('Debes ser administradora para eliminar fotos.', 'danger');
+      return;
+    }
+    const photo = photos.find(p => p.id === photoId);
+    if (photo && photo.storage_path) {
+      showToast('La administración de fotos compartidas requiere autenticación de administradora en Supabase.', 'danger');
       return;
     }
     openDeletePhotoModal(photoId);
