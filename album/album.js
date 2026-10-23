@@ -673,7 +673,9 @@ document.addEventListener('DOMContentLoaded', () => {
      3. SUBIDA Y DROPZONE DE IMÁGENES
      ========================================================================== */
   if (dropzone && fileInput) {
-    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('click', (e) => {
+      if (e.target !== fileInput) fileInput.click();
+    });
 
     ['dragenter', 'dragover'].forEach(eventName => {
       dropzone.addEventListener(eventName, (e) => {
