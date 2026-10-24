@@ -27,7 +27,7 @@ create table public.album_admins (
 
 alter table public.album_admins enable row level security;
 revoke all on public.album_admins from anon, authenticated;
-grant select on public.album_admins to authenticated;
+grant select on public.album_admins to anon, authenticated;
 
 create policy "Admins can verify own membership"
   on public.album_admins for select to authenticated
