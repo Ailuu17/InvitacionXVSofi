@@ -494,15 +494,20 @@ body.admin-mode .admin-active-badge {
   cursor: pointer;
 }
 
+.dropzone-box[hidden] {
+  display: none;
+}
+
 /* Vista previa de imagen antes de subir */
 .preview-container {
   display: none;
-  margin-top: 15px;
+  margin-top: 0;
   position: relative;
   border-radius: 12px;
-  overflow: hidden;
   border: 1px solid var(--border-gold);
-  max-height: 220px;
+  padding-bottom: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  text-align: center;
 }
 
 .preview-container.active {
@@ -514,6 +519,7 @@ body.admin-mode .admin-active-badge {
   height: 200px;
   object-fit: cover;
   display: block;
+  border-radius: 11px 11px 0 0;
 }
 
 .btn-remove-preview {
@@ -536,6 +542,26 @@ body.admin-mode .admin-active-badge {
 
 .btn-remove-preview:hover {
   background: var(--primary-dark);
+}
+
+.btn-change-preview {
+  margin-top: 12px;
+  padding: 9px 18px;
+  background: #ffffff;
+  border: 1px solid var(--border-delicate);
+  border-radius: 50px;
+  color: var(--primary-dark);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-change-preview:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
 }
 
 .upload-submit-btn {

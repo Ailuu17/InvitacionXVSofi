@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const previewContainer = document.getElementById('preview-container');
   const previewImg = document.getElementById('preview-img');
   const removePreviewBtn = document.getElementById('remove-preview-btn');
+  const changePreviewBtn = document.getElementById('change-preview-btn');
 
   // Filtros y Búsqueda
   const filterTabs = document.querySelectorAll('.filter-tab-btn');
@@ -739,6 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (previewImg && previewContainer) {
         previewImg.src = selectedFileBase64;
         previewContainer.classList.add('active');
+        if (dropzone) dropzone.hidden = true;
       }
     };
     reader.onerror = () => {
@@ -755,12 +757,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (changePreviewBtn && fileInput) {
+    changePreviewBtn.addEventListener('click', () => fileInput.click());
+  }
+
   const resetUploadPreview = () => {
     selectedFileBase64 = null;
     selectedFile = null;
     if (fileInput) fileInput.value = '';
     if (previewImg) previewImg.src = '';
     if (previewContainer) previewContainer.classList.remove('active');
+    if (dropzone) dropzone.hidden = false;
   };
 
   /* ==========================================================================
