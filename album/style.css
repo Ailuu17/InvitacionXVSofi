@@ -1212,7 +1212,7 @@ body.admin-mode .photo-card.is-archived {
 }
 
 /* ==========================================================================
-   MODAL ADMIN (ACCESO CON CLAVE)
+   MODAL ADMIN (ACCESO SUPABASE)
    ========================================================================== */
 .admin-modal-backdrop {
   position: fixed;
@@ -1277,25 +1277,31 @@ body.admin-mode .photo-card.is-archived {
   margin-bottom: 20px;
 }
 
-.pin-input-field {
+.admin-auth-label {
+  display: block;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+
+.admin-auth-input {
   width: 100%;
-  text-align: center;
-  font-size: 1.4rem;
-  letter-spacing: 6px;
-  font-weight: 700;
+  font: inherit;
+  font-size: 1rem;
   padding: 12px;
   border-radius: 12px;
   border: 2px solid var(--border-gold);
-  margin-bottom: 15px;
+  margin-bottom: 14px;
   outline: none;
 }
 
-.pin-input-field:focus {
+.admin-auth-input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 4px rgba(250, 128, 114, 0.2);
 }
 
-.pin-error-msg {
+.admin-auth-error {
   color: #e06355;
   font-size: 0.85rem;
   font-weight: 600;

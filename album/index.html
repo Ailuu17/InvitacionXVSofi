@@ -263,16 +263,18 @@
 
             <div class="admin-modal-icon">👑</div>
             <h3 class="admin-modal-title">Modo Administradora</h3>
-            <p class="admin-modal-text">Ingresá el PIN de seguridad de Sofía para gestionar y eliminar fotos del álbum.</p>
+            <p class="admin-modal-text">Ingresá el PIN de 4 dígitos de administradora para gestionar las fotos compartidas.</p>
 
-            <input type="password" id="admin-pin-input" class="pin-input-field" maxlength="8" placeholder="••••" autocomplete="off">
-            
-            <!-- //cambiar mensaje o PIN por defecto aquí (por defecto es 1515) -->
-            <p class="pin-error-msg" id="pin-error-msg">PIN incorrecto. Intentá nuevamente.</p>
+            <form id="admin-login-form">
+                <label class="admin-auth-label" for="admin-pin-input">PIN de administradora</label>
+                <input type="password" id="admin-pin-input" class="admin-auth-input" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="off" aria-describedby="admin-auth-error" required>
 
-            <button type="button" class="btn-cta btn-luxury" id="admin-submit-btn" style="width: 100%;">
-                Ingresar como Administradora
-            </button>
+                <p class="admin-auth-error" id="admin-auth-error" role="alert"></p>
+
+                <button type="submit" class="btn-cta btn-luxury" id="admin-submit-btn" style="width: 100%;">
+                    Ingresar como Administradora
+                </button>
+            </form>
         </div>
     </div>
 

@@ -1,5 +1,6 @@
--- Run once in the Supabase SQL Editor. Add the administrator's Auth user ID
--- to public.album_admins before enabling remote archive/delete controls.
+-- Run once in the Supabase SQL Editor. Then create the administrator account
+-- in Authentication > Users and add its user ID to public.album_admins:
+-- insert into public.album_admins (user_id) values ('<AUTH_USER_UUID>'::uuid);
 create table public.album_photos (
   id text primary key,
   storage_path text not null unique,

@@ -6,16 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // CLAVES DE ALMACENAMIENTO PERSISTENTE
   const STORAGE_KEY_PHOTOS = 'XV_SOFIA_ALBUM_PHOTOS';
   const STORAGE_KEY_LIKES = 'XV_SOFIA_ALBUM_LIKES';
-  const STORAGE_KEY_ADMIN = 'XV_SOFIA_ALBUM_ADMIN';
   const STORAGE_KEY_DELETED = 'XV_SOFIA_ALBUM_DELETED_IDS';
   const STORAGE_KEY_INITIALIZED = 'XV_SOFIA_ALBUM_INIT_V2';
-  const ADMIN_PIN = '1515'; // //cambiar clave de administradora aquí si se desea
 
   // ESTADO DE LA APLICACIÓN
   let photos = [];
   let deletedPhotoIds = [];
   let userLikes = JSON.parse(localStorage.getItem(STORAGE_KEY_LIKES) || '{}');
-  let isAdmin = localStorage.getItem(STORAGE_KEY_ADMIN) === 'true';
+  let isAdmin = false;
   let adminStatusFilter = 'all'; // 'active' | 'archived' | 'all'
   let currentFilter = 'ALL';
   let currentSearch = '';
@@ -66,10 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Admin DOM
   const adminToggleBtn = document.getElementById('btn-admin-toggle');
   const adminModal = document.getElementById('admin-modal');
+  const adminLoginForm = document.getElementById('admin-login-form');
   const adminPinInput = document.getElementById('admin-pin-input');
   const adminSubmitBtn = document.getElementById('admin-submit-btn');
   const adminCloseBtn = document.getElementById('admin-close-btn');
-  const pinErrorMsg = document.getElementById('pin-error-msg');
+  const adminAuthError = document.getElementById('admin-auth-error');
 
   // Admin Exit Modal DOM
   const adminExitModal = document.getElementById('admin-exit-modal');
@@ -269,11 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const initAlbum = async () => {
     initSparklesCanvas();
 
-    if (isAdmin) {
-      document.body.classList.add('admin-mode');
-      updateAdminButtonUI();
-    }
-
     // Inicializar IndexedDB
     dbHelper = await initIndexedDB();
 
@@ -289,6 +283,26 @@ document.addEventListener('DOMContentLoaded', () => {
         supabaseInitializationError = error;
         console.error('No se pudo inicializar Supabase', error);
         showToast('No se pudo iniciar la conexión con el álbum compartido.', 'danger');
+      }
+    }
+
+    if (supabase) {
+      supabase.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_OUT') {
+          setAdminMode(false);
+          renderGallery();
+        }
+      });
+
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        if (data.session && await isSupabaseAdmin(data.session)) {
+          setAdminMode(true);
+        }
+      } catch (error) {
+        console.error('No se pudo verificar la sesión administradora', error);
+        showToast('No se pudieron verificar los permisos de administración.', 'danger');
       }
     }
 
@@ -897,16 +911,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const photo = photos.find(p => p.id === photoId);
     if (!photo) return;
 
-    if (photo.storage_path) {
-      showToast('La administración de fotos compartidas requiere autenticación de administradora en Supabase.', 'danger');
+    const isCurrentlyArchived = photo.status === 'archived';
+    const nextStatus = isCurrentlyArchived ? 'active' : 'archived';
+
+    try {
+      if (photo.storage_path) {
+        const { data, error } = await supabase
+          .from('album_photos')
+          .update({ status: nextStatus })
+          .eq('id', photoId)
+          .select('id, status')
+          .maybeSingle();
+
+        if (error) throw error;
+        if (!data) throw new Error('Supabase no autorizó el cambio de estado de esta foto.');
+        photo.status = data.status;
+        await refreshSharedPhotos();
+      } else {
+        photo.status = nextStatus;
+        await savePhotosToStorage();
+        await refreshAlbumFromStorage();
+      }
+    } catch (error) {
+      console.error('No se pudo cambiar el estado de la foto', error);
+      showToast('No se pudo archivar o desarchivar la foto. Verificá la conexión y los permisos de Supabase.', 'danger');
       return;
     }
-
-    const isCurrentlyArchived = photo.status === 'archived';
-    photo.status = isCurrentlyArchived ? 'active' : 'archived';
-
-    await savePhotosToStorage();
-    await refreshAlbumFromStorage();
 
     const toastMsg = photo.status === 'archived'
       ? 'Foto archivada 📦 Ahora solo es visible en modo administradora.'
@@ -948,53 +978,76 @@ document.addEventListener('DOMContentLoaded', () => {
   // Confirmar eliminación permanente de la foto
   if (deleteConfirmBtn) {
     deleteConfirmBtn.addEventListener('click', async () => {
-      if (photoToDeleteId && isAdmin) {
-        const idToDelete = photoToDeleteId;
+      if (!photoToDeleteId || !isAdmin) {
+        closeDeletePhotoModal();
+        return;
+      }
 
-        // 1. Añadir a la lista de fotos eliminadas persistentemente
-        if (!deletedPhotoIds.includes(idToDelete)) {
-          deletedPhotoIds.push(idToDelete);
+      const idToDelete = photoToDeleteId;
+      const photo = photos.find(item => item.id === idToDelete);
+      if (!photo) {
+        closeDeletePhotoModal();
+        return;
+      }
+
+      deleteConfirmBtn.disabled = true;
+      try {
+        if (photo.storage_path) {
+          const { data, error } = await supabase
+            .from('album_photos')
+            .delete()
+            .eq('id', idToDelete)
+            .select('id, storage_path')
+            .maybeSingle();
+
+          if (error) throw error;
+          if (!data) throw new Error('Supabase no autorizó la eliminación de esta foto.');
+
+          const { error: storageError } = await supabase.storage
+            .from(storageBucket)
+            .remove([data.storage_path]);
+          if (storageError) {
+            console.error('No se pudo eliminar el archivo de Storage', storageError);
+            showToast('La foto se quitó del álbum, pero no se pudo borrar su archivo de Storage.', 'danger');
+          } else {
+            showToast('Foto eliminada permanentemente del álbum 🗑️', 'success');
+          }
+
+          await refreshSharedPhotos();
+        } else {
+          if (!deletedPhotoIds.includes(idToDelete)) {
+            deletedPhotoIds.push(idToDelete);
+          }
+          await saveDeletedIdsToStorage();
+          photos = photos.filter(item => item.id !== idToDelete);
+          await savePhotosToStorage();
+          if (dbHelper) await idbDeletePhoto(dbHelper, idToDelete);
+          await refreshAlbumFromStorage();
+          showToast('Foto eliminada permanentemente del álbum 🗑️', 'success');
         }
-        await saveDeletedIdsToStorage();
 
-        // 2. Remover del array de fotos en memoria
-        photos = photos.filter(p => p.id !== idToDelete);
-
-        // 3. Remover de almacenamiento permanente (LocalStorage e IndexedDB)
-        await savePhotosToStorage();
-
-        if (dbHelper) {
-          await idbDeletePhoto(dbHelper, idToDelete);
-        }
-
-        // 4. Limpiar Me Gusta
         if (userLikes[idToDelete]) {
           delete userLikes[idToDelete];
           localStorage.setItem(STORAGE_KEY_LIKES, JSON.stringify(userLikes));
         }
 
-        // 5. Refrescar el álbum desde el almacenamiento para confirmar la persistencia
-        await refreshAlbumFromStorage();
-
-        showToast('Foto eliminada permanentemente del álbum 🗑️', 'success');
         renderGallery();
-
         if (lightboxModal && lightboxModal.classList.contains('active')) {
           closeLightbox();
         }
+        closeDeletePhotoModal();
+      } catch (error) {
+        console.error('No se pudo eliminar la foto', error);
+        showToast('No se pudo eliminar la foto. Verificá la conexión y los permisos de Supabase.', 'danger');
+      } finally {
+        deleteConfirmBtn.disabled = false;
       }
-      closeDeletePhotoModal();
     });
   }
 
   const deletePhoto = (photoId) => {
     if (!isAdmin) {
       showToast('Debes ser administradora para eliminar fotos.', 'danger');
-      return;
-    }
-    const photo = photos.find(p => p.id === photoId);
-    if (photo && photo.storage_path) {
-      showToast('La administración de fotos compartidas requiere autenticación de administradora en Supabase.', 'danger');
       return;
     }
     openDeletePhotoModal(photoId);
@@ -1121,6 +1174,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const setAdminMode = (enabled) => {
+    isAdmin = enabled;
+    document.body.classList.toggle('admin-mode', enabled);
+    updateAdminButtonUI();
+  };
+
+  const isSupabaseAdmin = async (session) => {
+    const { data, error } = await supabase
+      .from('album_admins')
+      .select('user_id')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+
+    if (error) throw error;
+    return Boolean(data);
+  };
+
   const openAdminExitModal = () => {
     if (adminExitModal) {
       adminExitModal.classList.add('active');
@@ -1142,15 +1212,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (adminExitConfirmBtn) {
-    adminExitConfirmBtn.addEventListener('click', () => {
-      isAdmin = false;
-      localStorage.setItem(STORAGE_KEY_ADMIN, 'false');
-      document.body.classList.remove('admin-mode');
-      updateAdminButtonUI();
+    adminExitConfirmBtn.addEventListener('click', async () => {
       closeAdminExitModal();
-
-      // Resetear filtro admin a active por defecto
       adminStatusFilter = 'all';
+      if (supabase) {
+        let error;
+        try {
+          ({ error } = await supabase.auth.signOut());
+        } catch (signOutError) {
+          error = signOutError;
+        }
+        if (error) {
+          console.error('No se pudo cerrar la sesión administradora en Supabase', error);
+          setAdminMode(false);
+          showToast('Se cerró el modo administradora en esta página, pero Supabase no confirmó el cierre de sesión.', 'danger');
+          renderGallery();
+          return;
+        }
+      }
+      setAdminMode(false);
       showToast('Has salido del modo administradora.', 'info');
       renderGallery();
     });
@@ -1169,7 +1249,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const openAdminModal = () => {
     if (adminModal) {
       adminPinInput.value = '';
-      pinErrorMsg.style.display = 'none';
+      adminAuthError.style.display = 'none';
       adminModal.classList.add('active');
       setTimeout(() => adminPinInput.focus(), 200);
     }
@@ -1188,40 +1268,61 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const verifyPin = () => {
-    const inputPin = adminPinInput.value.trim();
-    if (inputPin === ADMIN_PIN || inputPin.toLowerCase() === 'sofia15') {
-      isAdmin = true;
-      localStorage.setItem(STORAGE_KEY_ADMIN, 'true');
-      document.body.classList.add('admin-mode');
-      updateAdminButtonUI();
-      closeAdminModal();
+  const signInAdmin = async (event) => {
+    event.preventDefault();
+    adminAuthError.style.display = 'none';
+    if (!supabase) {
+      adminAuthError.textContent = 'No está disponible la conexión con Supabase. Revisá la configuración del álbum.';
+      adminAuthError.style.display = 'block';
+      return;
+    }
 
-      // Por defecto en admin: All para ver activas y archivadas
-      adminStatusFilter = 'all';
-      adminStatusTabs.forEach(t => {
-        if (t.getAttribute('data-status') === 'all') {
-          t.classList.add('active');
-        } else {
-          t.classList.remove('active');
-        }
+    adminSubmitBtn.disabled = true;
+    adminSubmitBtn.textContent = 'Verificando acceso...';
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-pin-login', {
+        body: { pin: adminPinInput.value }
       });
+      if (error) throw error;
+      if (!data.access_token || !data.refresh_token) {
+        throw new Error('El servicio de autenticación no devolvió una sesión válida.');
+      }
 
-      showToast('¡Bienvenida Sofía! Modo Administradora activado 👑', 'success');
+      const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token
+      });
+      if (sessionError) throw sessionError;
+      if (!sessionData.session || !await isSupabaseAdmin(sessionData.session)) {
+        const { error: signOutError } = await supabase.auth.signOut();
+        if (signOutError) {
+          console.error('No se pudo cerrar la sesión de una cuenta sin permisos de administración', signOutError);
+        }
+        adminAuthError.textContent = 'La cuenta vinculada al PIN no está habilitada como administradora del álbum.';
+        adminAuthError.style.display = 'block';
+        return;
+      }
+
+      setAdminMode(true);
+      adminPinInput.value = '';
+      closeAdminModal();
+      adminStatusFilter = 'all';
+      adminStatusTabs.forEach(tab => {
+        tab.classList.toggle('active', tab.getAttribute('data-status') === 'all');
+      });
+      showToast('¡Bienvenida! Modo administradora activado 👑', 'success');
       renderGallery();
-    } else {
-      pinErrorMsg.style.display = 'block';
-      adminPinInput.classList.add('shake');
-      setTimeout(() => adminPinInput.classList.remove('shake'), 500);
+    } catch (error) {
+      console.error('No se pudo iniciar sesión administradora', error);
+      adminAuthError.textContent = 'No se pudo validar el PIN. Revisá que sea correcto y que el acceso seguro esté configurado en Supabase.';
+      adminAuthError.style.display = 'block';
+    } finally {
+      adminSubmitBtn.disabled = false;
+      adminSubmitBtn.textContent = 'Ingresar como Administradora';
     }
   };
 
-  if (adminSubmitBtn) adminSubmitBtn.addEventListener('click', verifyPin);
-  if (adminPinInput) {
-    adminPinInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') verifyPin();
-    });
-  }
+  if (adminLoginForm) adminLoginForm.addEventListener('submit', signInAdmin);
 
   /* ==========================================================================
      8. DESTELLOS DE FONDO (CANVAS SPARKLES)
